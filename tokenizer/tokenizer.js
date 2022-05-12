@@ -263,8 +263,22 @@ module.exports = class Tokenizer {
               } else {
                 if (isNaN(tmpTokenString)) {
                   this.addToken(this.t.identifier_token, tmpTokenString, {}, true);
+                  break;
                 } else if (tmpTokenString.length > 0) {
+                  // Check decimal numbers
+                  if(!isNaN(tmpTokenString)) {
+                    if(this.peekChar(this.text) === ".") {
+                      this.advanceString();
+                      tmpTokenString += ".";
+                      // Loop this.text until we find a non-number
+                      while(this.text[this.textPos + 1]?.match(/[0-9]/i)) {
+                        tmpTokenString += this.text[this.textPos + 1];
+                        this.advanceString();
+                      }
+                    }                    
+                  }
                   this.addToken(this.t.literal_token, tmpTokenString, {}, true);
+                  break;
                 }
                 if (nextToken === "?") {
                   if (this.peekChar(this.text, 2) == ".") {
