@@ -22,3 +22,5 @@ node_modules
 # misc
 babeltest/test.as
 babeltest/test.js
+yarn.lock
+package-lock.json
