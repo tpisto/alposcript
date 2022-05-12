@@ -1,0 +1,19 @@
+{
+  "name": "alposcript",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.mjs",
+  "dependencies": {
+    "StringScanner": "~0.0.3"
+  },
+  "devDependencies": {
+    "babel": "*",
+    "@babel/generator": "7.1.3",
+    "chalk": "^2.4.2"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}
