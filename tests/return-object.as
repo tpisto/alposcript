@@ -7,3 +7,12 @@ a = b do
 b = b do
   c: () -> return
     d: '#fff'
+
+a = ->
+  b:
+    c: 1
+
+a = ->
+  console.log 'x'
+  b:
+    c: 1

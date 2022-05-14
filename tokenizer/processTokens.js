@@ -154,13 +154,25 @@ module.exports = function processTokens(tokens, myTokenArray) {
     if (myTokenArray[i].name == "block_token") {
       // Convert following syntax to object_expression_token (b: 1 is object expression)
       // $ 'a',
-      //   b: 1
-      if (myTokenArray[i].value == "INDENT" && myTokenArray[i + 1].name == "object_property_token") {
+      //   b:
+      //     c: 1
+      if (
+        myTokenArray[i - 2]?.name == "object_property_token" &&
+        myTokenArray[i - 1]?.name == "end_token" &&
+        myTokenArray[i].value == "INDENT" &&
+        myTokenArray[i + 1].name == "object_property_token"
+      ) {
         myTokenArray[i].props = { ...myTokenArray[i].props, ...{ hasBlock: true, blockValue: myTokenArray[i].value } };
         myTokenArray[i] = convertToken(tokens.object_expression_token, myTokenArray[i]);
         if (myTokenArray[i - 1].name == "end_token") {
           myTokenArray.splice(i - 1, 1);
         }
+      }
+
+      // Convert call_expression_token block_token object_property token to object_expression_token
+      if (myTokenArray[i - 1]?.name == "call_expression_token" && myTokenArray[i + 1]?.name == "object_property_token") {
+        myTokenArray[i].props = { ...myTokenArray[i].props, ...{ hasBlock: true, blockValue: myTokenArray[i].value } };
+        myTokenArray[i] = convertToken(tokens.object_expression_token, myTokenArray[i]);
       }
 
       if (myTokenArray[i].value == "{") {

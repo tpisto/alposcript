@@ -90,6 +90,7 @@ module.exports = function getTokens() {
 
   let expression = (rightBindingPower, options) => {
     try {
+      // console.log("NextToken", peekToken().name);
       let left = getNextToken().nullDenotation(options);
       while (rightBindingPower < peekToken().leftBindingPower) {
         // console.log("INSIDE1", peekToken().name, peekToken().leftBindingPower);
@@ -1411,61 +1412,46 @@ module.exports = function getTokens() {
         let body = [];
         variableStack.push();
 
-        // Do not use block if we are making ObjectExpression using indents
-        if (peekToken().name == "object_property_token" && value == "INDENT") {
-          let myObjectExpression = expression(0);
+        do {
+          if (peekToken().name != "block_token") {
+            let myExpression = expression(0, options);
+
+            // Maybe would be better to add returned exression if it's statement. But now we do it here (easy for now).
+            if (!notExpressionStatements.includes(myExpression.type) && options?.noExpressionStatement != true && !options?.isParameterOrElement) {
+              body.push({
+                type: "ExpressionStatement",
+                expression: myExpression,
+                start: myExpression.start,
+                end: myExpression.end,
+                loc: myExpression.loc,
+              });
+            } else {
+              body.push(myExpression);
+            }
+          }
           while (peekToken().name == "end_token") {
             consumeToken("end_token");
           }
-          consumeToken("block_token");
-          variableStack.addVariablesToBody(body);
-          return myObjectExpression;
+        } while (peekToken().name != "block_token" && peekToken().value != "}");
+        consumeToken("block_token");
+
+        variableStack.addVariablesToBody(body);
+
+        if (body.length > 0) {
+          return {
+            type: "BlockStatement",
+            body: body,
+            start: body[0].start,
+            end: body[body.length - 1].end,
+            loc: {
+              start: body[0].loc.start,
+              end: body[body.length - 1].loc.end,
+            },
+          };
+        } else {
+          return createNudLoc({ type: "BlockStatement", body: [] }, props);
         }
-
-        //
-        // This is the normal block case
-        //
-        else {
-          do {
-            if (peekToken().name != "block_token") {
-              let myExpression = expression(0, options);
-
-              // Maybe would be better to add returned exression if it's statement. But now we do it here (easy for now).
-              if (!notExpressionStatements.includes(myExpression.type) && options?.noExpressionStatement != true && !options?.isParameterOrElement) {
-                body.push({
-                  type: "ExpressionStatement",
-                  expression: myExpression,
-                  start: myExpression.start,
-                  end: myExpression.end,
-                  loc: myExpression.loc,
-                });
-              } else {
-                body.push(myExpression);
-              }
-            }
-            while (peekToken().name == "end_token") {
-              consumeToken("end_token");
-            }
-          } while (peekToken().name != "block_token" && peekToken().value != "}");
-          consumeToken("block_token");
-
-          variableStack.addVariablesToBody(body);
-
-          if (body.length > 0) {
-            return {
-              type: "BlockStatement",
-              body: body,
-              start: body[0].start,
-              end: body[body.length - 1].end,
-              loc: {
-                start: body[0].loc.start,
-                end: body[body.length - 1].loc.end,
-              },
-            };
-          } else {
-            return createNudLoc({ type: "BlockStatement", body: [] }, props);
-          }
-        }
+        // }
       },
     };
   };
@@ -1504,6 +1490,7 @@ module.exports = function getTokens() {
           (arrowToken.value == "->" || arrowToken.value == "->>") &&
           !(peekToken().name == "return_statement_token" && peekToken(2).name == "end_token" && peekToken(3).name == "block_token")
         ) {
+          // console.log("N");
           variableStack.push();
           body = expression(5);
           variableStack.addVariablesToBody(body);
