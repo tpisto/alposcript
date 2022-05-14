@@ -1078,6 +1078,13 @@ module.exports = function getTokens() {
           argument = expression(0);
         }
 
+        // If return is returning block with multiple items in body, we change it into array
+        if (argument.type == "BlockStatement" && argument.body.length > 1) {
+          argument = {
+            type: "ArrayExpression",
+            elements: argument.body,
+          };
+        }
         return createNudLoc(
           {
             type: "ReturnStatement",
@@ -1514,14 +1521,14 @@ module.exports = function getTokens() {
         if (
           arrowToken &&
           body.type == "ReturnStatement" &&
-          (body.argument.type == "BlockStatement" || (body.argument.type == "ObjectExpression" && arrowToken.value != "=>" && arrowToken.value != "=>>"))
+          (body.argument.type == "BlockStatement" || ((body.argument.type == "ObjectExpression" || body.argument.type == "ArrayExpression") && arrowToken.value != "=>" && arrowToken.value != "=>>"))
         ) {
           if (body.argument?.body?.length > 1) {
             throw new Error("You cannot have more than one immediate return value in the block (must be at the main level)");
           } else {
             if (arrowToken.value == "->" || arrowToken.value == "->>") {
               let argument = null;
-              if (body.argument.type == "ObjectExpression" && peekToken().name == "end_token") {
+              if ((body.argument.type == "ObjectExpression" || body.argument.type == "ArrayExpression") && peekToken().name == "end_token") {
                 argument = body.argument;
               } else {
                 argument = body.argument.body[0];
