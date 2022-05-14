@@ -170,7 +170,7 @@ module.exports = function processTokens(tokens, myTokenArray) {
       }
 
       // Convert call_expression_token block_token object_property token to object_expression_token
-      if (myTokenArray[i - 1]?.name == "call_expression_token" && myTokenArray[i + 1]?.name == "object_property_token") {
+      if (myTokenArray[i - 1]?.name == "call_expression_token" && myTokenArray[i].value == "INDENT" && myTokenArray[i + 1]?.name == "object_property_token") {
         myTokenArray[i].props = { ...myTokenArray[i].props, ...{ hasBlock: true, blockValue: myTokenArray[i].value } };
         myTokenArray[i] = convertToken(tokens.object_expression_token, myTokenArray[i]);
       }
