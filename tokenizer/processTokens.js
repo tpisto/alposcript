@@ -3,6 +3,14 @@ module.exports = function processTokens(tokens, myTokenArray) {
     return fn(token.value, token.props, token);
   };
 
+  // Stage 0, remove double end_tokens
+  for (let i = 0; i < myTokenArray.length - 1; i++) {
+    if (myTokenArray[i].name === "end_token" && myTokenArray[i + 1].name === "end_token") {
+      myTokenArray.splice(i, 1);
+      i--;
+    }
+  }
+
   // Stage 1 and 2 are just similiar, but some token fixes are affecint other token processing functions
 
   // Stage 1.
