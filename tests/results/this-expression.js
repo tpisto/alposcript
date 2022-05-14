@@ -1,5 +1,5 @@
 this.props.test;
 
 function a() {
-  this.props.test;
+  return this.props.test;
 };

@@ -1546,6 +1546,20 @@ module.exports = function getTokens() {
           extra = { parenthesized: true, parenStart: props.start };
         }
 
+        // Update 14.5.2022. After much thinking I have decided that like in Rust
+        // the final expression in the function will be used as return value. Rust is awesome language, so let's do it their way.
+        // CoffeeScript and LiveScript also has this feature, but they have more extreme "everything is an expression" rules.
+
+        // !TODO! This is ok for now, but we should have support for IF and ELSE
+        if (body.type == "BlockStatement" && body.body.length > 0) {
+          // IF last element is expression, then we can use it as return value by converting ExpressionStatement to ReturnStatement
+          if (body.body[body.body.length - 1].type == "ExpressionStatement") {
+            body.body[body.body.length - 1].type = "ReturnStatement";
+            body.body[body.body.length - 1].argument = body.body[body.body.length - 1].expression;
+            delete body.body[body.body.length - 1].expression;
+          }
+        }
+
         return createNudLoc(
           {
             type: arrowToken.value == "=>>" || arrowToken.value == "=>" ? "ArrowFunctionExpression" : "FunctionExpression",
