@@ -118,11 +118,18 @@ module.exports = function processTokens(tokens, myTokenArray) {
       myTokenArray.splice(i + 1, 0, tokens.variable_declarator_token("let", myTokenArray[i].props));
     }
 
-    // !TODO! refactor this. No need for token conversion.
+    // !TODO! refactor this.
     // Create arrow expression token
     if (myTokenArray[i].name == "arrow_token") {
       let prevToken = (myTokenArray[i - 1] || {}).name;
-      if (prevToken == "parenthesis_close_token") {
+
+      // Add function declartion token if previous is identifier token: myFunctionName -> return c
+      if (prevToken == "identifier_token") {
+        myTokenArray.splice(i - 1, 0, tokens.function_declaration_token("", myTokenArray[i].props));
+        myTokenArray.splice(i + 1, 0, tokens.function_token("(", myTokenArray[i].props));
+        myTokenArray.splice(i + 2, 0, { name: "parenthesis_close_token", value: ")", props: myTokenArray[i].props });
+        i = i + 3;
+      } else if (prevToken == "parenthesis_close_token") {
         let closedParenthesisCount = 0;
         for (let p = i; p >= 0; p--) {
           if (myTokenArray[p].name == "parenthesis_close_token") {
