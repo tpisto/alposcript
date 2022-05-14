@@ -787,7 +787,7 @@ module.exports = function getTokens() {
         if (peekToken(1).name == "end_token" && peekToken(2).name == "block_token" && (peekToken(3).name == "object_expression_token" || peekToken(3).name == "object_property_token")) {
           consumeToken("end_token");
         }
-        let right = expression(0);
+        let right = expression(0, { isParameterOrElement: true });
         return createLedLoc(
           {
             type: "AssignmentExpression",
