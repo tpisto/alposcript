@@ -266,16 +266,16 @@ module.exports = class Tokenizer {
                   break;
                 } else if (tmpTokenString.length > 0) {
                   // Check decimal numbers
-                  if(!isNaN(tmpTokenString)) {
-                    if(this.peekChar(this.text) === ".") {
+                  if (!isNaN(tmpTokenString)) {
+                    if (this.peekChar(this.text) === ".") {
                       this.advanceString();
                       tmpTokenString += ".";
                       // Loop this.text until we find a non-number
-                      while(this.text[this.textPos + 1]?.match(/[0-9]/i)) {
+                      while (this.text[this.textPos + 1]?.match(/[0-9]/i)) {
                         tmpTokenString += this.text[this.textPos + 1];
                         this.advanceString();
                       }
-                    }                    
+                    }
                   }
                   this.addToken(this.t.literal_token, tmpTokenString, {}, true);
                   break;
@@ -288,8 +288,18 @@ module.exports = class Tokenizer {
                   this.advanceString();
                 }
                 if (nextToken === ".") {
-                  this.addToken(this.t.member_expression_token, ".", {}, true);
-                  this.advanceString();
+                  // Spread element
+                  if (this.peekChar(this.text, 1) == "." && this.peekChar(this.text, 2) == ".") {
+                    this.addToken(this.t.spread_element_token, "...", {}, true);
+                    this.advanceString();
+                    this.advanceString();
+                    this.advanceString();
+                  }
+                  // Member expression
+                  else {
+                    this.addToken(this.t.member_expression_token, ".", {}, true);
+                    this.advanceString();
+                  }
                 }
               }
               break;

@@ -359,6 +359,27 @@ module.exports = function getTokens() {
     };
   };
 
+  tokens.spread_element_token = (value, props) => {
+    return {
+      name: "spread_element_token",
+      leftBindingPower: 80,
+      props: props,
+      value: value,
+      nullDenotation: () => {
+        let right = expression(200);
+        return createLocation(
+          {
+            type: "SpreadElement",
+            argument: right,
+          },
+          null,
+          right,
+          props
+        );
+      },
+    };
+  };
+
   // tokens.member_expression_computed_token = (value, props) => {
   //   return {
   //     name: "member_expression_token",
@@ -1338,9 +1359,10 @@ module.exports = function getTokens() {
         }
 
         while (
-          (peekToken().name == "comma_token" && peekToken(2).name == "object_property_token") ||
+          (peekToken().name == "comma_token" && (peekToken(2).name == "object_property_token" || peekToken(2).name == "spread_element_token")) ||
           (!props.firstProperty && peekToken(2).name == "identifier_token") ||
-          peekToken().name == "object_property_token"
+          peekToken().name == "object_property_token" ||
+          peekToken().name == "spread_element_token"
         ) {
           if (peekToken().name == "comma_token") {
             consumeToken("comma_token");

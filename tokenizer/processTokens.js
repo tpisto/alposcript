@@ -194,7 +194,7 @@ module.exports = function processTokens(tokens, myTokenArray) {
         let nextToken1 = myTokenArray[i + 1] || {};
         let nextToken2 = myTokenArray[i + 2] || {};
 
-        if (nextToken1.name == "object_property_token") {
+        if (nextToken1.name == "object_property_token" || nextToken1.name == "spread_element_token") {
           myTokenArray[i].props = Object.assign({}, myTokenArray[i].props, { hasBlock: true, blockValue: myTokenArray[i].value });
           myTokenArray[i] = convertToken(tokens.object_expression_token, myTokenArray[i]);
         }
