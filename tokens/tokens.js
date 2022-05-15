@@ -362,11 +362,12 @@ module.exports = function getTokens() {
   tokens.spread_element_token = (value, props) => {
     return {
       name: "spread_element_token",
-      leftBindingPower: 80,
+      leftBindingPower: 81,
       props: props,
       value: value,
       nullDenotation: () => {
-        let right = expression(200);
+        let right = expression(0);
+        console.log("X", right);
         return createLocation(
           {
             type: "SpreadElement",
