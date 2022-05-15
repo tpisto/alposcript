@@ -367,7 +367,6 @@ module.exports = function getTokens() {
       value: value,
       nullDenotation: () => {
         let right = expression(0);
-        console.log("X", right);
         return createLocation(
           {
             type: "SpreadElement",
