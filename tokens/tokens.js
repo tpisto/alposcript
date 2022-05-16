@@ -683,7 +683,7 @@ module.exports = function getTokens() {
           if (peekToken().name == "end_token") {
             consumeToken("end_token");
           }
-          alternate = expression(0);
+          alternate = expression(0, { noExpressionStatement: true });
         }
 
         if (options && options.isParameterOrElement == true) {
@@ -700,13 +700,14 @@ module.exports = function getTokens() {
               },
             };
           }
+
           if (consequent.type == "BlockStatement") {
-            if (consequent.body.length > 1) {
-              throw new Error("You have too many lines in the if block");
-            } else {
-              consequent = consequent.body[0];
-            }
+            consequent = wrapBodyIntoSequenceExpression(consequent.body);
           }
+          if (alternate.type == "BlockStatement") {
+            alternate = wrapBodyIntoSequenceExpression(alternate.body);
+          }
+
           return createNudLoc(
             {
               type: "ConditionalExpression",
@@ -1735,6 +1736,25 @@ module.exports = function getTokens() {
       };
     } else {
       return token;
+    }
+  };
+
+  let wrapBodyIntoSequenceExpression = (body) => {
+    if (body.length > 1) {
+      return createLocation(
+        {
+          type: "SequenceExpression",
+          expressions: body,
+          extra: {
+            parenthesized: true,
+          },
+        },
+        body[0],
+        body[body.length - 1],
+        null
+      );
+    } else {
+      return body[0];
     }
   };
 
