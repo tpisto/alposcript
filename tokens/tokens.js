@@ -1405,11 +1405,13 @@ module.exports = function getTokens() {
             consumeToken("block_token", "DEDENT");
           }
         }
-        return createNudLoc(
+        return createLocation(
           {
             type: props.type == "ObjectPattern" ? "ObjectPattern" : "ObjectExpression",
             properties: properties,
           },
+          properties,
+          properties,
           props
         );
       },
@@ -1560,11 +1562,17 @@ module.exports = function getTokens() {
         // the final expression in the function will be used as return value. Rust is awesome language, so let's do it their way.
         // CoffeeScript and LiveScript also has this feature, but they have more extreme "everything is an expression" rules.
         if (body.type == "BlockStatement" && body.body.length > 0) {
+          let lastElement = body.body[body.body.length - 1];
+
           // IF last element is expression, then we can use it as return value by converting ExpressionStatement to ReturnStatement
-          if (body.body[body.body.length - 1].type == "ExpressionStatement") {
-            body.body[body.body.length - 1].type = "ReturnStatement";
-            body.body[body.body.length - 1].argument = body.body[body.body.length - 1].expression;
-            delete body.body[body.body.length - 1].expression;
+          if (lastElement.type == "ExpressionStatement") {
+            lastElement.type = "ReturnStatement";
+            lastElement.argument = lastElement.expression;
+            delete lastElement.expression;
+          }
+          // If last element is ObjectExpression, then we can use it as return value by adding ReturnStatement
+          else if (lastElement.type == "ObjectExpression") {
+            body.body[body.body.length - 1] = createLocation({ type: "ReturnStatement", argument: lastElement }, lastElement, lastElement, props);
           }
         }
 
