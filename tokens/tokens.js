@@ -1,4 +1,4 @@
-let notExpressionStatements = ["VariableDeclaration", "ImportDeclaration", "ExportNamedDeclaration", "ExportDefaultDeclaration", "ExpressionStatement", "ReturnStatement"];
+let notExpressionStatements = ["VariableDeclaration", "ImportDeclaration", "ExportNamedDeclaration", "ExportDefaultDeclaration", "ExpressionStatement", "ReturnStatement", "IfStatement"];
 
 module.exports = function getTokens() {
   let tokens = {};
@@ -1561,6 +1561,7 @@ module.exports = function getTokens() {
         // Update 14.5.2022. After much thinking I have decided that like in Rust
         // the final expression in the function will be used as return value. Rust is awesome language, so let's do it their way.
         // CoffeeScript and LiveScript also has this feature, but they have more extreme "everything is an expression" rules.
+        // !TODO! Do not create it here, but instead tell to the expressions also that they can be used as return value.
         if (body.type == "BlockStatement" && body.body.length > 0) {
           let lastElement = body.body[body.body.length - 1];
 
