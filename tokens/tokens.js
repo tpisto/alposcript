@@ -92,6 +92,7 @@ module.exports = function getTokens() {
     try {
       // console.log("NextToken", peekToken().name);
       let left = getNextToken().nullDenotation(options);
+      // console.log("L", JSON.stringify(left, null, 4));
       while (rightBindingPower < peekToken().leftBindingPower) {
         // console.log("INSIDE1", peekToken().name, peekToken().leftBindingPower);
         left = getNextToken().leftDenotation(left, options);
@@ -1187,6 +1188,12 @@ module.exports = function getTokens() {
   function getCallParameters() {
     let params = [];
 
+    // Handling the following case:
+    // let a = b do
+    //   c: 1
+    //   , d, e, f
+    let hasIndentBlock = peekToken().value == "INDENT" ? true : false;
+
     // Allow empty lines before first arguments
     if (peekToken().name == "end_token") {
       consumeToken("end_token");
@@ -1221,6 +1228,14 @@ module.exports = function getTokens() {
     if (peekToken().name == "parenthesis_close_token") {
       consumeToken("parenthesis_close_token");
     }
+
+    if (hasIndentBlock && params.length > 1) {
+      if (peekToken().name == "end_token") {
+        consumeToken("end_token");
+      }
+      consumeToken("block_token");
+    }
+
     return params;
   }
 
@@ -1425,7 +1440,13 @@ module.exports = function getTokens() {
             if (peekToken().name == "end_token") {
               consumeToken("end_token");
             }
-            consumeToken("block_token", "DEDENT");
+            // We can have object expression as function parameterers block, like
+            // let a = myFunction do
+            //   a: 1
+            //   , 1, 2, 3 # rest of the function parameters
+            if (peekToken().name != "comma_token") {
+              consumeToken("block_token", "DEDENT");
+            }
           }
         }
         return createLocation(
@@ -1497,9 +1518,12 @@ module.exports = function getTokens() {
             },
           };
         } else {
-          return createNudLoc({ type: "BlockStatement", body: [] }, props);
+          if (options?.isParameterOrElement && value == "{") {
+            return createNudLoc({ type: "ObjectExpression", properties: [] }, props);
+          } else {
+            return createNudLoc({ type: "BlockStatement", body: [] }, props);
+          }
         }
-        // }
       },
     };
   };

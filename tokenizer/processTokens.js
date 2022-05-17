@@ -225,6 +225,12 @@ module.exports = function processTokens(tokens, myTokenArray) {
           myTokenArray.splice(i, 2);
           i = i - 2;
         }
+
+        // Convert block {} at for example "let a = {}"" into object. Previous object needs to be assignment_expression_token.
+        if (myTokenArray[i - 1].name == "assignment_expression_token" && nextToken1.name == "block_token" && nextToken1.value == "}") {
+          Object.assign(myTokenArray[i].props, { hasBlock: true, blockValue: "{" });
+          myTokenArray[i] = convertToken(tokens.object_expression_token, myTokenArray[i]);
+        }
       }
       // Fix block + indent block
       else if (myTokenArray[i].value == "DEDENT") {
