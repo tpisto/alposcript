@@ -2,8 +2,9 @@ module.exports = function handleTemplateLiteral(text, textPos) {
   let templatePositions = [];
   let hasTemplates = false;
   let quasisStart = null;
+  let i = textPos;
   // Get string that is inside the parentheses
-  for (let i = textPos; i < text.length; i++) {
+  for (; i < text.length; i++) {
     if (text[i] == '"' && text[i - 1] != "\\") {
       break;
     }
@@ -45,8 +46,12 @@ module.exports = function handleTemplateLiteral(text, textPos) {
   }
 
   if (hasTemplates) {
-    let last = templatePositions[templatePositions.length - 1];
-    templatePositions.push({ start: last.end + 1, end: last.end + 1, type: "hyphen_close" });
+    if(quasisStart != null) {
+      templatePositions.push({ start: quasisStart, end: i - 1, type: "last" });
+    } else {
+      let last = templatePositions[templatePositions.length - 1];
+      templatePositions.push({ start: last.end + 1, end: last.end + 1, type: "last" });
+    }
     // We need to have template element before any template expressions
     if (templatePositions[0].type == "expression") {
       templatePositions.unshift({ start: templatePositions[0].start, end: templatePositions[0].start, type: "first" });

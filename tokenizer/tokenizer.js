@@ -455,9 +455,15 @@ module.exports = class Tokenizer {
               this.textPos = this.textPos + 2;
               return true;
             }
-          } else if (pos.type == "hyphen_close") {
-            this.addToken(this.t.template_element_token, "", { tail: true });
-            this.textPos = this.textPos + 1;
+          } else if (pos.type == "last") {
+            let quasis = this.text.substring(pos.start, pos.end + 1);
+            if(quasis == '"') {
+              this.addToken(this.t.template_element_token, '', { tail: true });
+              this.textPos = pos.end + 1;
+            } else {
+              this.addToken(this.t.template_element_token, quasis, { tail: true });
+              this.textPos = pos.end + 2;
+            }
             return true;
           }
         }
