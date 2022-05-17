@@ -245,6 +245,9 @@ module.exports = class Tokenizer {
             case "default":
               this.addToken("default", tmpTokenString, null, true);
               break;
+            case "yield":
+              this.addToken(this.t.yield_expression_token, tmpTokenString, null, true);
+              break;
             case "function":
               this.addToken(this.t.function_declaration_token, tmpTokenString, null, true);
               break;
@@ -457,8 +460,8 @@ module.exports = class Tokenizer {
             }
           } else if (pos.type == "last") {
             let quasis = this.text.substring(pos.start, pos.end + 1);
-            if(quasis == '"') {
-              this.addToken(this.t.template_element_token, '', { tail: true });
+            if (quasis == '"') {
+              this.addToken(this.t.template_element_token, "", { tail: true });
               this.textPos = pos.end + 1;
             } else {
               this.addToken(this.t.template_element_token, quasis, { tail: true });

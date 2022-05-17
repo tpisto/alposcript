@@ -1073,6 +1073,29 @@ module.exports = function getTokens() {
     };
   };
 
+  tokens.yield_expression_token = (value, props) => {
+    return {
+      name: "yield_expression_token",
+      leftBindingPower: 0,
+      props: props,
+      value: value,
+      nullDenotation: () => {
+        let right = expression(0);
+        return createLocation(
+          {
+            type: "YieldExpression",
+            prefix: true,
+            operator: value,
+            argument: right,
+          },
+          null,
+          right,
+          props
+        );
+      },
+    };
+  };
+
   // *************************
   // Functions
   // *************************
