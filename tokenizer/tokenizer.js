@@ -240,7 +240,7 @@ module.exports = class Tokenizer {
               this.addToken(this.t.binary_expression_token, tmpTokenString, null, true);
               break;
             case "export":
-              this.addToken("export", tmpTokenString, null, true);
+              this.addToken(this.t.export_token, tmpTokenString, null, true);
               break;
             case "default":
               this.addToken("default", tmpTokenString, null, true);

@@ -264,9 +264,8 @@ module.exports = function processTokens(tokens, myTokenArray) {
     }
 
     // "export default"
-    if (myTokenArray[i].name == "export" && myTokenArray[i + 1].name == "default") {
+    if (myTokenArray[i].name == "export_token" && myTokenArray[i + 1].name == "default") {
       myTokenArray[i].props.default = true;
-      myTokenArray[i] = convertToken(tokens.export_token, myTokenArray[i]);
       myTokenArray.splice(i + 1, 1);
     }
   }
