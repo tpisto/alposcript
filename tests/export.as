@@ -2,7 +2,7 @@
 export default a
 export default a()()
 export default () => a
-export default a() =>
+export default fn a() =>
   return b
 
 export const a = 10

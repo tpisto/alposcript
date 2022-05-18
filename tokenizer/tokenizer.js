@@ -248,7 +248,7 @@ module.exports = class Tokenizer {
             case "yield":
               this.addToken(this.t.yield_expression_token, tmpTokenString, null, true);
               break;
-            case "function":
+            case "fn":
               this.addToken(this.t.function_declaration_token, tmpTokenString, null, true);
               break;
 

@@ -123,13 +123,14 @@ module.exports = function processTokens(tokens, myTokenArray) {
     if (myTokenArray[i].name == "arrow_token") {
       let prevToken = (myTokenArray[i - 1] || {}).name;
 
-      // Add function declartion token if previous is identifier token: myFunctionName -> return c
-      if (prevToken == "identifier_token") {
-        myTokenArray.splice(i - 1, 0, tokens.function_declaration_token("", myTokenArray[i].props));
-        myTokenArray.splice(i + 1, 0, tokens.function_token("(", myTokenArray[i].props));
-        myTokenArray.splice(i + 2, 0, { name: "parenthesis_close_token", value: ")", props: myTokenArray[i].props });
-        i = i + 3;
-      } else if (prevToken == "parenthesis_close_token") {
+      // // Add function declartion token if previous is identifier token: myFunctionName -> return c
+      // if (prevToken == "identifier_token") {
+      //   myTokenArray.splice(i - 1, 0, tokens.function_declaration_token("", myTokenArray[i].props));
+      //   myTokenArray.splice(i + 1, 0, tokens.function_token("(", myTokenArray[i].props));
+      //   myTokenArray.splice(i + 2, 0, { name: "parenthesis_close_token", value: ")", props: myTokenArray[i].props });
+      //   i = i + 3;
+      // } else
+      if (prevToken == "parenthesis_close_token") {
         let closedParenthesisCount = 0;
         for (let p = i; p >= 0; p--) {
           if (myTokenArray[p].name == "parenthesis_close_token") {
@@ -139,11 +140,11 @@ module.exports = function processTokens(tokens, myTokenArray) {
             if (myTokenArray[p].name == "parenthesis_open_token") {
               if (closedParenthesisCount == 1) {
                 myTokenArray[p] = convertToken(tokens.function_token, myTokenArray[p]);
-                // This "whiteSpace / nonWhiteSpace" is used to allow creation of named functions like "export default a() => b"
-                if (myTokenArray[p].props.type == "nonWhiteSpace") {
-                  myTokenArray[p - 1] = convertToken(tokens.identifier_token, myTokenArray[p - 1]);
-                  myTokenArray.splice(p - 1, 0, tokens.function_declaration_token("", myTokenArray[p - 1].props));
-                }
+                // // This "whiteSpace / nonWhiteSpace" is used to allow creation of named functions like "export default a() => b"
+                // if (myTokenArray[p].props.type == "nonWhiteSpace") {
+                //   myTokenArray[p - 1] = convertToken(tokens.identifier_token, myTokenArray[p - 1]);
+                //   myTokenArray.splice(p - 1, 0, tokens.function_declaration_token("", myTokenArray[p - 1].props));
+                // }
               } else {
                 closedParenthesisCount--;
               }

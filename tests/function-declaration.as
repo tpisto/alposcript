@@ -1,13 +1,12 @@
 # Function declarations
-navigateBack ->
+fn navigateBack ->
   navigate(-1)
 
-navigateBack() ->
+fn navigateBack() ->
   navigate(-1)
 
-navigateBack ->>
+fn navigateBack ->>
   navigate(-1)
 
-navigateBack() ->>
+fn navigateBack() ->>
   navigate(-1)
-

@@ -1,4 +1,4 @@
 # This expression: @
 @props.test
-a() => 
+fn a() -> 
   @props.test
