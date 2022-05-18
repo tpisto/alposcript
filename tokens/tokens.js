@@ -1216,7 +1216,6 @@ module.exports = function getTokens() {
 
   function getCallParameters() {
     let params = [];
-
     // Handling the following case:
     // let a = b do
     //   c: 1
@@ -1251,6 +1250,14 @@ module.exports = function getTokens() {
         // We don't do anything now if parentheses immediately close.
       } else {
         params.push(expression(5, { isParameterOrElement: true }));
+      }
+
+      // Enable call expression with function parameter and then other parameters, like:
+      // useEffect ->
+      //   return a
+      // , [];
+      if (peekToken().name == "end_token" && peekToken(2).name == "comma_token") {
+        consumeToken("end_token");
       }
     } while (peekToken().name == "comma_token");
 
