@@ -336,7 +336,13 @@ module.exports = function getTokens() {
         if (peekToken().name == "call_expression_token") {
           right = tokens.identifier_token(peekToken().value, props).nullDenotation();
         } else {
-          right = expression(200);
+          // Handle member expressions inside the array, like:
+          // let a = b.c[e.f];
+          if (props.computed && value == "[") {
+            right = expression(0);
+          } else {
+            right = expression(200);
+          }
         }
 
         if (props.computed) {

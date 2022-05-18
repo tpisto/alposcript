@@ -1,5 +1,6 @@
 # Object, todo: empty object
 let a = { }
+let a = b.c[e.f]
 { a: 1 }
 { b: '1' }
 { c: "1" }
