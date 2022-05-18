@@ -79,6 +79,12 @@ module.exports = function processTokens(tokens, myTokenArray) {
       }
     }
 
+    // Allow let a = b.c?.[e.f]. Add computed to OptionalMemberExpression
+    if (myTokenArray[i].name == "member_expression_token" && myTokenArray[i].value == "?." && myTokenArray[i + 1].name == "array_token" && myTokenArray[i + 1].value == "[") {
+      myTokenArray[i].props.computed = true;
+      myTokenArray.splice(i + 1, 1);
+    }
+
     // Convert )( to call. // We can have a(1)(2)(3) calls
     if (myTokenArray[i].name == "parenthesis_close_token" && myTokenArray[i + 1].name == "parenthesis_open_token") {
       myTokenArray[i + 1] = convertToken(tokens.parenthesized_call_expression_token, myTokenArray[i + 1]);

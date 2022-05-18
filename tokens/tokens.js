@@ -338,7 +338,7 @@ module.exports = function getTokens() {
         } else {
           // Handle member expressions inside the array, like:
           // let a = b.c[e.f];
-          if (props.computed && value == "[") {
+          if (props.computed) {
             right = expression(0);
           } else {
             right = expression(200);
