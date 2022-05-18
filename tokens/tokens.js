@@ -424,6 +424,9 @@ module.exports = function getTokens() {
               type: "ExportNamedDeclaration",
               declaration: right,
               exportKind: "value", // For now we support only "value" export kinds
+              source: null,
+              specifiers: [], // For now we don't support specifiers
+              assertions: [], // For now we don't support assertions
             },
             null,
             right,
