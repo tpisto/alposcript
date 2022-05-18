@@ -408,15 +408,28 @@ module.exports = function getTokens() {
       nullDenotation: (options) => {
         sourceType = "module";
         let right = expression(0);
-        return createLocation(
-          {
-            type: props.default ? "ExportDefaultDeclaration" : "ExportNamedDeclaration",
-            declaration: right,
-          },
-          null,
-          right,
-          props
-        );
+        if (props.default) {
+          return createLocation(
+            {
+              type: "ExportDefaultDeclaration",
+              declaration: right,
+            },
+            null,
+            right,
+            props
+          );
+        } else {
+          return createLocation(
+            {
+              type: "ExportNamedDeclaration",
+              declaration: right,
+              exportKind: "value", // For now we support only "value" export kinds
+            },
+            null,
+            right,
+            props
+          );
+        }
       },
     };
   };
