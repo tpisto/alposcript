@@ -467,7 +467,7 @@ module.exports = function getTokens() {
     };
   };
 
-  tokens.import_specifier_token = (value, props, token) => {
+  tokens.import_specifier_token = (value, props, importedToken, localToken) => {
     return {
       name: "import_specifier_token",
       value: value,
@@ -475,8 +475,8 @@ module.exports = function getTokens() {
       nullDenotation: () => {
         return {
           type: props.default ? "ImportDefaultSpecifier" : "ImportSpecifier",
-          imported: token.nullDenotation(),
-          local: token.nullDenotation(),
+          imported: importedToken.nullDenotation(),
+          local: localToken ? localToken.nullDenotation() : importedToken.nullDenotation(),
           importKind: null,
         };
       },
@@ -518,8 +518,21 @@ module.exports = function getTokens() {
             if (peekToken().name == "block_token") {
               break;
             }
-            let identifier = consumeToken("identifier_token");
-            importSpecifiers.push(tokens.import_specifier_token(identifier.value, identifier.props, identifier).nullDenotation());
+
+            // Import with specifiers: import { NN as MMM } from "react"
+            if (peekToken().name == "call_expression_token" && peekToken(2).name == "call_expression_token" && peekToken(2).value == "as") {
+              let imported = consumeToken("call_expression_token");
+              // Convert into identifier token
+              imported = tokens.identifier_token(imported.value, imported.props);
+              consumeToken("call_expression_token");
+              let local = consumeToken("identifier_token");
+              importSpecifiers.push(tokens.import_specifier_token(imported.value, imported.props, imported, local).nullDenotation());
+            }
+            // Normal
+            else {
+              let identifier = consumeToken("identifier_token");
+              importSpecifiers.push(tokens.import_specifier_token(identifier.value, identifier.props, identifier).nullDenotation());
+            }
             skipComma = false;
           } while (peekToken().name == "comma_token");
           consumeToken("block_token");
