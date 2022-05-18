@@ -701,7 +701,7 @@ module.exports = function getTokens() {
             break;
         }
 
-        let consequent = expression(0, { noExpressionStatement: true });
+        let consequent = expression(0, options);
 
         // Else can be in block or without block
         if (peekToken().name == "else_token") {
@@ -713,7 +713,7 @@ module.exports = function getTokens() {
           if (peekToken().name == "end_token") {
             consumeToken("end_token");
           }
-          alternate = expression(0, { noExpressionStatement: true });
+          alternate = expression(0, options);
         }
 
         if (options && options.isParameterOrElement == true) {
@@ -1519,6 +1519,7 @@ module.exports = function getTokens() {
 
         do {
           if (peekToken().name != "block_token") {
+            // Maybe would be better to add returned exression if it's statement. But now we do it here (easy for now).
             let myExpression = expression(0, options);
 
             // Maybe would be better to add returned exression if it's statement. But now we do it here (easy for now).

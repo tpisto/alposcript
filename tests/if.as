@@ -41,3 +41,7 @@ myFunctionCall a, b, c, if a then b else c, 10, 20, "10", if d == 1 then c else 
     $ 'c'
     $ 'd'
   ]
+
+let a = (b) ->* 
+  if c
+    yield d
