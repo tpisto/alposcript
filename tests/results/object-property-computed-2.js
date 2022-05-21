@@ -13,3 +13,18 @@ testFn2(function () {
     [b]: 3
   };
 });
+testCall({
+  [a]: 1
+});
+testCall({
+  [a]: 1,
+  b: 1
+});
+testCall({
+  b: 1,
+  [a]: 2
+});
+testCall({
+  b: 1,
+  [a]: [b]
+});
