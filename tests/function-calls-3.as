@@ -11,3 +11,7 @@ $ 'a',
 # Function calls for return values
 a(1)(2)(3)
 (() => a+1)()
+
+# Function call with member expression comparision as return value
+let a = _.b c, (d) -> 
+  d.e == f.g
