@@ -667,7 +667,23 @@ module.exports = function getTokens() {
           if (peekToken(1).name == "end_token" && peekToken(2).name == "block_token" && (peekToken(3).name == "object_expression_token" || peekToken(3).name == "object_property_token")) {
             consumeToken("end_token");
           }
-          declaration = expression(0);
+
+          // Allow to have the declaration on the next line
+          if (peekToken().name == "end_token" && peekToken(2).name == "block_token") {
+            consumeToken("end_token");
+          }
+
+          // Allow to have the declaration on the next line
+          if (peekToken().name == "block_token") {
+            consumeToken("block_token");
+            declaration = expression(0);
+            if (peekToken().name == "end_token" && peekToken(2).name == "block_token") {
+              consumeToken("end_token");
+            }
+            consumeToken("block_token");
+          } else {
+            declaration = expression(0);
+          }
         }
 
         return createLedLoc(
@@ -857,12 +873,26 @@ module.exports = function getTokens() {
       props: props,
       leftBindingPower: 90,
       leftDenotation: (left) => {
+        let right;
         variableStack.set(left.name);
         // Allow define object properies in the next line
         if (peekToken(1).name == "end_token" && peekToken(2).name == "block_token" && (peekToken(3).name == "object_expression_token" || peekToken(3).name == "object_property_token")) {
           consumeToken("end_token");
         }
-        let right = expression(0, { isParameterOrElement: true });
+
+        // Allow to have the declaration on the next line
+        if (peekToken().name == "block_token") {
+          consumeToken("block_token");
+          right = expression(0);
+          if (peekToken().name == "end_token" && peekToken(2).name == "block_token") {
+            consumeToken("end_token");
+          }
+          consumeToken("block_token");
+        } else {
+          right = expression(0, { isParameterOrElement: true });
+        }
+
+        // let right = expression(0, { isParameterOrElement: true });
         return createLedLoc(
           {
             type: "AssignmentExpression",
