@@ -269,6 +269,28 @@ module.exports = function processTokens(tokens, myTokenArray) {
       myTokenArray[i].props.default = true;
       myTokenArray.splice(i + 1, 1);
     }
+
+    // Convert computed object expresssions: let a = [b]: 1
+    if (myTokenArray[i].name == "colon_token" && myTokenArray[i - 1]?.name == "array_token" && myTokenArray[i - 1]?.value == "]") {
+      let closedArrayCount = 0;
+      for (let p = i; p >= 0; p--) {
+        if (myTokenArray[p].name == "array_token" && myTokenArray[p].value == "]") {
+          closedArrayCount++;
+        } else {
+          // Allow also use parentheses inside parameters
+          if (myTokenArray[p].name == "array_token" && myTokenArray[p].value == "[") {
+            if (closedArrayCount == 1) {
+              myTokenArray[p].props.computed = true;
+              myTokenArray[p] = convertToken(tokens.object_property_token, myTokenArray[p]);
+            } else {
+              closedArrayCount--;
+            }
+            break;
+          }
+        }
+      }
+      myTokenArray.splice(i, 1);
+    }
   }
 
   return myTokenArray;

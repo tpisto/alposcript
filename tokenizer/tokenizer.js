@@ -264,6 +264,8 @@ module.exports = class Tokenizer {
                     this.tokenArray.splice(this.tokenArray.length - 1, 1);
                   }
                   tmpTokenString = this.addToken(this.t.object_property_token, tmpTokenString);
+                } else {
+                  this.addToken("colon_token", ":");
                 }
                 this.advanceString();
               } else {
