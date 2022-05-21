@@ -256,14 +256,14 @@ module.exports = function getTokens() {
   };
 
   tokens.object_property_token = (value, props) => {
-    function getPropertyStructure(value, props, propertyValue) {
+    function getPropertyStructure(value, props, propertyValue, keyValue) {
       return createNudLoc(
         {
           type: "ObjectProperty",
           method: false,
           shorthand: false,
-          computed: false,
-          key: tokens.identifier_token(value, props).nullDenotation(),
+          computed: props.computed == true,
+          key: keyValue,
           value: propertyValue,
         },
         props
@@ -277,6 +277,18 @@ module.exports = function getTokens() {
       nullDenotation: (options) => {
         let prevToken = peekToken(-1);
 
+        // We support also computed object keys: let a = { [b]: 1 }
+        let keyValue = null;
+        if (props.computed) {
+          keyValue = expression(0);
+          if (keyValue.type == "ArrayExpression") {
+            keyValue = keyValue.elements[0];
+          } else {
+            consumeToken("array_token", "]");
+          }
+        } else {
+          keyValue = tokens.identifier_token(value, props).nullDenotation();
+        }
         // If this is the first property, we wrap this inside ObjectExpression
         let propertyValue = expression(0);
 
@@ -297,8 +309,8 @@ module.exports = function getTokens() {
                   type: "ObjectProperty",
                   method: false,
                   shorthand: false,
-                  computed: false,
-                  key: tokens.identifier_token(value, props).nullDenotation(),
+                  computed: props.computed == true,
+                  key: keyValue,
                   value: propertyValue,
                 },
                 props
@@ -309,12 +321,12 @@ module.exports = function getTokens() {
           return createNudLoc(
             {
               type: "ObjectExpression",
-              properties: [getPropertyStructure(value, props, propertyValue)],
+              properties: [getPropertyStructure(value, props, propertyValue, keyValue)],
             },
             props
           );
         } else {
-          return getPropertyStructure(value, props, propertyValue);
+          return getPropertyStructure(value, props, propertyValue, keyValue);
         }
       },
     };
@@ -1445,7 +1457,7 @@ module.exports = function getTokens() {
         }
 
         while (
-          (peekToken().name == "comma_token" && (peekToken(2).name == "object_property_token" || peekToken(2).name == "spread_element_token")) ||
+          (peekToken().name == "comma_token" && (peekToken(2).name == "object_property_token" || peekToken(2).name == "spread_element_token" || peekToken(2).name == "array_token")) ||
           (!props.firstProperty && peekToken(2).name == "identifier_token") ||
           peekToken().name == "object_property_token" ||
           peekToken().name == "spread_element_token"
@@ -1453,8 +1465,15 @@ module.exports = function getTokens() {
           if (peekToken().name == "comma_token") {
             consumeToken("comma_token");
           }
-          let nextTokenName = peekToken().name;
-          let objectProperty = expression(0, { isFirstProperty: properties.length <= 0 && props.hasBlock != true });
+
+          let objectProperty = null;
+          let nextToken = peekToken();
+          let nextTokenName = nextToken.name;
+          if (nextTokenName == "array_token") {
+            objectProperty = tokens.object_property_token(nextToken.value, { ...nextToken.props, computed: true }).nullDenotation({ isFirstProperty: false });
+          } else {
+            objectProperty = expression(0, { isFirstProperty: properties.length <= 0 && props.hasBlock != true });
+          }
 
           // We allow also single identifiers - that needs to be converted to object properties
           if (nextTokenName == "identifier_token" && options?.isVariableDeclaration != true) {

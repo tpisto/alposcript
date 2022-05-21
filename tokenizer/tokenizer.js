@@ -256,12 +256,15 @@ module.exports = class Tokenizer {
             default:
               let nextToken = this.peekChar(this.text);
               if (nextToken === ":") {
-                // Allow using reserved words as object property names
-                if (tmpTokenString.length == 0) {
-                  tmpTokenString = this.tokenArray[this.tokenArray.length - 1].value;
-                  this.tokenArray.splice(this.tokenArray.length - 1, 1);
+                // We whould skip computed member expression [a]: 1
+                if (this.peekChar(this.text, 0) != "]") {
+                  // Allow using reserved words as object property names
+                  if (tmpTokenString.length == 0) {
+                    tmpTokenString = this.tokenArray[this.tokenArray.length - 1].value;
+                    this.tokenArray.splice(this.tokenArray.length - 1, 1);
+                  }
+                  tmpTokenString = this.addToken(this.t.object_property_token, tmpTokenString);
                 }
-                tmpTokenString = this.addToken(this.t.object_property_token, tmpTokenString);
                 this.advanceString();
               } else {
                 if (isNaN(tmpTokenString)) {
