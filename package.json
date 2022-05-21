@@ -1,6 +1,6 @@
 {
   "name": "@tpisto/alposcript",
-  "version": "0.2.23",
+  "version": "0.2.24",
   "description": "",
   "main": "index.mjs",
   "dependencies": {

@@ -31,16 +31,16 @@ let g1 = (a, b, c) => {
 };
 
 let a2 = function (a, b, c) {
-  a * 2 + b / c
+  return a * 2 + b / c;
 };
 
 let b2 = function () {
-  a * 2 + b / c
+  return a * 2 + b / c;
 };
 
 let c2 = {
   a: function () {
-    a + b / c
+    return a + b / c;
   }
 };
 
@@ -71,11 +71,11 @@ let g2 = function (a, b, c) {
 let h1 = async () => a + 1;
 
 let h2 = async function () {
-  a + 1
+  return a + 1;
 };
 
 let h3 = async a => a + 1;
 
 let h4 = async function (a) {
-  a + 1
+  return a + 1;
 };

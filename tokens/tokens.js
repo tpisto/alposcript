@@ -1610,14 +1610,32 @@ module.exports = function getTokens() {
           (arrowToken.value == "->" || arrowToken.value == "->>") &&
           !(peekToken().name == "return_statement_token" && peekToken(2).name == "end_token" && peekToken(3).name == "block_token")
         ) {
-          // console.log("N");
           variableStack.push();
           body = expression(5);
           variableStack.addVariablesToBody(body);
-          body = {
-            type: "BlockStatement",
-            body: [body],
-          };
+
+          // Check if we should have return statement
+          if (!notExpressionStatements.includes(body.type)) {
+            body = createLocation(
+              {
+                type: "ReturnStatement",
+                argument: body,
+              },
+              body,
+              body,
+              props
+            );
+          }
+
+          body = createLocation(
+            {
+              type: "BlockStatement",
+              body: [body],
+            },
+            body,
+            body,
+            props
+          );
         } else {
           body = expression(5, { isArrayFunction: true });
         }

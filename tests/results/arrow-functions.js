@@ -3,5 +3,5 @@ let a = function (ref) {
 };
 
 let b = function (ref) {
-  this.ref = 2
+  return this.ref = 2;
 };
