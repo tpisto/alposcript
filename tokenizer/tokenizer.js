@@ -41,7 +41,10 @@ module.exports = class Tokenizer {
           this.addToken(this.t.member_expression_token, ".");
           break;
         case "[":
-          this.addToken(this.t.array_token, "[");
+          let token = this.addToken(this.t.array_token, "[");
+          if (this.text.charAt(this.textPos - 1) != " ") {
+            token.props.noWhitespace = true;
+          }
           break;
         case "]":
           this.addToken("array_token", "]");

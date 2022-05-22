@@ -79,6 +79,7 @@ module.exports = function processTokens(tokens, myTokenArray) {
         nextTokenName == "this_token" ||
         nextTokenName == "arrow_token" ||
         nextTokenName == "literal_token" ||
+        (nextTokenName == "array_token" && nextToken.value == "[" && nextToken.props.noWhitespace != true) ||
         nextTokenName == "object_property_token" ||
         nextTokenName == "parenthesis_open_token" ||
         (nextTokenName == "block_token" && nextToken.value == "{") ||
@@ -94,8 +95,9 @@ module.exports = function processTokens(tokens, myTokenArray) {
         }
         myTokenArray[i] = convertToken(tokens.call_expression_token, myTokenArray[i]);
       }
+
       // Make identifier token to member expression
-      if (nextTokenName == "array_token" && nextToken.value == "[") {
+      if (nextTokenName == "array_token" && nextToken.value == "[" && nextToken.props.noWhitespace == true) {
         myTokenArray[i + 1].props.computed = true;
         myTokenArray[i + 1] = convertToken(tokens.member_expression_token, myTokenArray[i + 1]);
       }
