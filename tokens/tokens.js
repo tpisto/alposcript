@@ -1432,7 +1432,7 @@ module.exports = function getTokens() {
 
         do {
           if (elements.length > 0) {
-            if (isBlock) {
+            if (isBlock && peekToken().name == "end_token") {
               consumeToken("end_token");
             } else {
               consumeToken("comma_token");
@@ -1446,6 +1446,9 @@ module.exports = function getTokens() {
           }
           // Add array element
           else if (peekToken().name != "array_token" && peekToken().value != "]") {
+            if (peekToken().name == "end_token") {
+              consumeToken("end_token");
+            }
             elements.push(expression(0, { isParameterOrElement: true }));
           }
         } while (peekToken().name == "comma_token" || (isBlock && peekToken().name == "end_token"));
