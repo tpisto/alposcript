@@ -10,8 +10,8 @@ module.exports = function getTokens() {
   // Auto declaring variables using 'let'
   let variableStack = {
     variableScopeStack: [],
-    push() {
-      let localVariableStack = { used: {}, add: {} };
+    push(hasScope) {
+      let localVariableStack = { used: {}, add: {}, hasScope: hasScope };
       this.variableScopeStack.push(localVariableStack);
     },
     addVariablesToBody(body) {
@@ -75,7 +75,17 @@ module.exports = function getTokens() {
     },
     set(name) {
       if (name) {
-        this.variableScopeStack[this.variableScopeStack.length - 1].add[name] = true;
+        // We allow create variables inside if scope
+        if (this.variableScopeStack[this.variableScopeStack.length - 1].hasScope) {
+          this.variableScopeStack[this.variableScopeStack.length - 1].add[name] = true;
+        } else {
+          if (this.variableScopeStack[this.variableScopeStack.length - 1].used[name] == true) {
+            this.variableScopeStack[this.variableScopeStack.length - 1].add[name] = true;
+          } else {
+            let index = this.variableScopeStack.length >= 2 ? this.variableScopeStack.length - 2 : 0;
+            this.variableScopeStack[index].add[name] = true;
+          }
+        }
       }
     },
     getVariables() {},
@@ -716,6 +726,10 @@ module.exports = function getTokens() {
       props: props,
       leftBindingPower: 0,
       nullDenotation: (options) => {
+        if (options?.hasScope) {
+          options = Object.assign(options, { hasScope: false });
+        }
+
         if (peekToken().name == "parenthesis_open_token") {
           skipNextToken();
         }
@@ -851,7 +865,11 @@ module.exports = function getTokens() {
         }
 
         consumeToken("end_token");
-        let body = expression(0);
+
+        // !URGENT TODO!
+        // !TODO! NOW WE HAVE SCOPED THE FOR LOOP. PLEASE TAKE INTO ACCOUNT THE FOR LOOP VARIABLES.
+        // WITH SCOPED APPROACH WE RECRATE THE FOR LOOP VARIABLES HERE.
+        let body = expression(0, { hasScope: true });
 
         return createNudLoc(
           {
@@ -1578,7 +1596,10 @@ module.exports = function getTokens() {
       props: props,
       nullDenotation: (options) => {
         let body = [];
-        variableStack.push();
+
+        // Functions have scope
+        let hasScope = options?.hasScope;
+        variableStack.push(hasScope);
 
         do {
           if (peekToken().name != "block_token") {
@@ -1604,7 +1625,7 @@ module.exports = function getTokens() {
         } while (peekToken().name != "block_token" && peekToken().value != "}");
         consumeToken("block_token");
 
-        variableStack.addVariablesToBody(body);
+        variableStack.addVariablesToBody(body, hasScope);
 
         if (body.length > 0) {
           return {
@@ -1663,7 +1684,7 @@ module.exports = function getTokens() {
           !(peekToken().name == "return_statement_token" && peekToken(2).name == "end_token" && peekToken(3).name == "block_token")
         ) {
           variableStack.push();
-          body = expression(5);
+          body = expression(5, { hasScope: true });
           variableStack.addVariablesToBody(body);
 
           // Check if we should have return statement
@@ -1689,10 +1710,8 @@ module.exports = function getTokens() {
             props
           );
         } else {
-          body = expression(5, { isArrayFunction: true });
+          body = expression(5, { isArrayFunction: true, hasScope: true });
         }
-
-        // console.log("B", body);
 
         // Allow using return at the same line with block to directly return something from the block. Useful in React
         if (

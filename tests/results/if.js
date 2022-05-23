@@ -1,4 +1,4 @@
-let d, f;
+let b, d, f;
 
 if (a !== b) {
   return a;
@@ -22,26 +22,20 @@ if (a >= b) {
 }
 
 if (a === 1) {
-  let b;
   b = 2;
 } else {
-  let d;
   d = 3;
 }
 
 if (a === 1) {
-  let b;
   b = 2;
 } else {
-  let d;
   d = 3;
 }
 
 if (a === 1) {
-  let b;
   b = 2;
 } else {
-  let d;
   d = 3;
 }
 
@@ -52,10 +46,8 @@ if (a !== b) {
 }
 
 if (a !== b) {
-  let d;
   d = 1;
 } else {
-  let f;
   f = 2;
 }
 
