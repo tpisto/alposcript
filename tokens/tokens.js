@@ -646,7 +646,7 @@ module.exports = function getTokens() {
               if (peekToken().name == "assignment_expression_token") {
                 consumeToken("assignment_expression_token", "=").value;
               }
-              declaration = expression(0);
+              declaration = expression(0, { isParameterOrElement: true });
               return createLedLoc(
                 {
                   type: "ExpressionStatement",
@@ -686,13 +686,13 @@ module.exports = function getTokens() {
           // Allow to have the declaration on the next line
           if (peekToken().name == "block_token") {
             consumeToken("block_token");
-            declaration = expression(0);
+            declaration = expression(0, { isParameterOrElement: true });
             if (peekToken().name == "end_token" && peekToken(2).name == "block_token") {
               consumeToken("end_token");
             }
             consumeToken("block_token");
           } else {
-            declaration = expression(0);
+            declaration = expression(0, { isParameterOrElement: true });
           }
         }
 
