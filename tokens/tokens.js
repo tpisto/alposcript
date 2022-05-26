@@ -1321,7 +1321,17 @@ module.exports = function getTokens() {
       } else if (peekToken().name == "parenthesis_close_token") {
         // We don't do anything now if parentheses immediately close.
       } else {
-        params.push(expression(5, { isParameterOrElement: true }));
+        let myParams = expression(5, { isParameterOrElement: true });
+
+        // Allow call with parameters in block
+        // myFunction do
+        //   c 1
+        //   d 2
+        if (myParams.type == "BlockStatement") {
+          params = params.concat(myParams.body);
+        } else {
+          params.push(myParams);
+        }
       }
 
       // Enable call expression with function parameter and then other parameters, like:
@@ -1341,7 +1351,9 @@ module.exports = function getTokens() {
       if (peekToken().name == "end_token") {
         consumeToken("end_token");
       }
-      consumeToken("block_token");
+      if (peekToken().name == "block_token") {
+        consumeToken("block_token");
+      }
     }
 
     return params;
