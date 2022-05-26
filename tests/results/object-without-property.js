@@ -1,8 +1,8 @@
 let a = {
-  a: a
+  a
 };
 let b = {
-  a: a,
-  b: b,
-  c: c
+  a,
+  b,
+  c
 };

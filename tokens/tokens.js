@@ -267,17 +267,18 @@ module.exports = function getTokens() {
 
   tokens.object_property_token = (value, props) => {
     function getPropertyStructure(value, props, propertyValue, keyValue) {
-      return createNudLoc(
-        {
-          type: "ObjectProperty",
-          method: false,
-          shorthand: false,
-          computed: props.computed == true,
-          key: keyValue,
-          value: propertyValue,
-        },
-        props
-      );
+      let token = {
+        type: "ObjectProperty",
+        method: false,
+        computed: props.computed == true,
+        key: keyValue,
+        value: propertyValue,
+      };
+      if (propertyValue.type == "Identifier" && keyValue.type == "Identifier" && propertyValue.name == keyValue.name) {
+        token.shorthand = true;
+        token.extra = { shorthand: true };
+      }
+      return createNudLoc(token, props);
     }
     return {
       name: "object_property_token",
@@ -1532,7 +1533,10 @@ module.exports = function getTokens() {
               {
                 type: "ObjectProperty",
                 method: false,
-                shorthand: false,
+                shorthand: true,
+                extra: {
+                  shorthand: true,
+                },
                 computed: false,
                 key: objectProperty,
                 value: objectProperty,
