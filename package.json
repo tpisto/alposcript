@@ -1,11 +1,8 @@
 {
   "name": "@tpisto/alposcript",
-  "version": "0.2.36",
+  "version": "0.2.37",
   "description": "",
-  "main": "index.mjs",
-  "dependencies": {
-    "StringScanner": "~0.0.3"
-  },
+  "main": "index.js",
   "devDependencies": {
     "babel": "*",
     "@babel/generator": "7.1.3",
