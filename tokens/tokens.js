@@ -301,7 +301,7 @@ module.exports = function getTokens() {
           keyValue = tokens.identifier_token(value, props).nullDenotation();
         }
         // If this is the first property, we wrap this inside ObjectExpression
-        let propertyValue = expression(0);
+        let propertyValue = expression(0, options);
 
         // !TODO! This was supposed to fix the case where we have only single object expression, but seems it's working after fixes at object_expression
         // !TODO! Remove this isSingle system if found ok.
@@ -1483,8 +1483,8 @@ module.exports = function getTokens() {
             // Allow null element in array like in: const [, setMyVar] = useState();
             if (peekToken().name == "comma_token") {
               elements.push(null);
-            } 
-            
+            }
+
             // Push element expression
             else {
               elements.push(expression(0, { isParameterOrElement: true }));
@@ -1524,7 +1524,7 @@ module.exports = function getTokens() {
           }
         } else {
           if (peekToken().name == "identifier_token") {
-            properties.push(expression(0, { isFirstProperty: properties.length <= 0 && props.hasBlock != true }));
+            properties.push(expression(0, { ...options, isFirstProperty: properties.length <= 0 && props.hasBlock != true }));
           }
         }
 
@@ -1544,7 +1544,7 @@ module.exports = function getTokens() {
           if (nextTokenName == "array_token") {
             objectProperty = tokens.object_property_token(nextToken.value, { ...nextToken.props, computed: true }).nullDenotation({ isFirstProperty: false });
           } else {
-            objectProperty = expression(0, { isFirstProperty: properties.length <= 0 && props.hasBlock != true });
+            objectProperty = expression(0, { ...options, isFirstProperty: properties.length <= 0 && props.hasBlock != true });
           }
 
           // We allow also single identifiers - that needs to be converted to object properties
@@ -1592,7 +1592,7 @@ module.exports = function getTokens() {
         }
         return createLocation(
           {
-            type: props.type == "ObjectPattern" ? "ObjectPattern" : "ObjectExpression",
+            type: props.type == "ObjectPattern" || options?.isParameterOrElement == true ? "ObjectPattern" : "ObjectExpression",
             properties: properties,
           },
           properties,
@@ -1688,7 +1688,7 @@ module.exports = function getTokens() {
             consumeToken("comma_token");
           }
           if (peekToken().name != "parenthesis_close_token") {
-            params.push(expression(5));
+            params.push(expression(5, { isParameterOrElement: true }));
           }
         } while (peekToken().name == "comma_token");
         consumeToken("parenthesis_close_token");

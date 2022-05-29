@@ -11,7 +11,7 @@ module.exports = function processTokens(tokens, myTokenArray) {
     }
   }
 
-  // Stage 1 and 2 are just similiar, but some token fixes are affecint other token processing functions
+  // Stage 1 and 2 are just similiar, but some token fixes are affecting other token processing functions
 
   // Stage 1.
   for (let i = 0; i < myTokenArray.length - 1; i++) {
