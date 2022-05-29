@@ -1,6 +1,6 @@
 {
   "name": "@tpisto/alposcript",
-  "version": "0.2.35",
+  "version": "0.2.36",
   "description": "",
   "main": "index.mjs",
   "dependencies": {
@@ -15,5 +15,5 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
-  "license": "ISC"
+  "license": "AYBABTU"
 }
