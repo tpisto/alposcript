@@ -1480,7 +1480,15 @@ module.exports = function getTokens() {
             if (peekToken().name == "end_token") {
               consumeToken("end_token");
             }
-            elements.push(expression(0, { isParameterOrElement: true }));
+            // Allow null element in array like in: const [, setMyVar] = useState();
+            if (peekToken().name == "comma_token") {
+              elements.push(null);
+            } 
+            
+            // Push element expression
+            else {
+              elements.push(expression(0, { isParameterOrElement: true }));
+            }
           }
         } while (peekToken().name == "comma_token" || (isBlock && peekToken().name == "end_token"));
 
