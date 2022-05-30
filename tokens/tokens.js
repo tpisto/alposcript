@@ -79,11 +79,19 @@ module.exports = function getTokens() {
         if (this.variableScopeStack[this.variableScopeStack.length - 1].hasScope) {
           this.variableScopeStack[this.variableScopeStack.length - 1].add[name] = true;
         } else {
-          if (this.variableScopeStack[this.variableScopeStack.length - 1].used[name] == true) {
-            this.variableScopeStack[this.variableScopeStack.length - 1].add[name] = true;
-          } else {
-            let index = this.variableScopeStack.length >= 2 ? this.variableScopeStack.length - 2 : 0;
-            this.variableScopeStack[index].add[name] = true;
+          if (this.variableScopeStack[this.variableScopeStack.length - 1].used[name] != true) {
+            for (let i = this.variableScopeStack.length - 1; i >= 0; i--) {
+              if (this.variableScopeStack[i].hasScope) {
+                if (this.variableScopeStack[i].used[name] != true) {
+                  this.variableScopeStack[i].add[name] = true;
+                  break;
+                } else {
+                  break;
+                }
+              }
+            }
+            // let index = this.variableScopeStack.length >= 2 ? this.variableScopeStack.length - 2 : 0;
+            // this.variableScopeStack[index].add[name] = true;
           }
         }
       }
@@ -760,7 +768,7 @@ module.exports = function getTokens() {
         // Else can be in block or without block
         if (peekToken().name == "else_token") {
           consumeToken("else_token");
-          alternate = expression(0);
+          alternate = expression(0, options);
         } else if (peekToken().name == "end_token" && peekToken(2).name == "else_token") {
           consumeToken("end_token");
           consumeToken("else_token");
@@ -1707,7 +1715,7 @@ module.exports = function getTokens() {
           (arrowToken.value == "->" || arrowToken.value == "->>") &&
           !(peekToken().name == "return_statement_token" && peekToken(2).name == "end_token" && peekToken(3).name == "block_token")
         ) {
-          variableStack.push();
+          variableStack.push(true);
           body = expression(5, { hasScope: true });
           variableStack.addVariablesToBody(body);
 
@@ -1827,7 +1835,7 @@ module.exports = function getTokens() {
       leftBindingPower: 0,
       nullDenotation: () => {
         let body = [];
-        variableStack.push();
+        variableStack.push(true);
 
         while (tokenArrayIndex < tokenArray.length - 1) {
           let myExpression = expression(0);
