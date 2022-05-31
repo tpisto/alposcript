@@ -1,6 +1,10 @@
 {
   "name": "@tpisto/alposcript",
+<<<<<<< HEAD
   "version": "0.2.42",
+=======
+  "version": "0.2.43",
+>>>>>>> 006b402 (Removed ObjectPattern)
   "description": "",
   "main": "index.js",
   "devDependencies": {
