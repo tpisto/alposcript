@@ -79,11 +79,17 @@ module.exports = function getTokens() {
         if (this.variableScopeStack[this.variableScopeStack.length - 1].hasScope) {
           this.variableScopeStack[this.variableScopeStack.length - 1].add[name] = true;
         } else {
-          if (this.variableScopeStack[this.variableScopeStack.length - 1].used[name] == true) {
-            this.variableScopeStack[this.variableScopeStack.length - 1].add[name] = true;
-          } else {
-            let index = this.variableScopeStack.length >= 2 ? this.variableScopeStack.length - 2 : 0;
-            this.variableScopeStack[index].add[name] = true;
+          if (this.variableScopeStack[this.variableScopeStack.length - 1].used[name] != true) {
+            for (let i = this.variableScopeStack.length - 1; i >= 0; i--) {
+              if (this.variableScopeStack[i].hasScope) {
+                if (this.variableScopeStack[i].used[name] != true) {
+                  this.variableScopeStack[i].add[name] = true;
+                }
+                break;
+              } else if (this.variableScopeStack[i].used[name] == true) {
+                break;
+              }
+            }
           }
         }
       }
@@ -1483,8 +1489,8 @@ module.exports = function getTokens() {
             // Allow null element in array like in: const [, setMyVar] = useState();
             if (peekToken().name == "comma_token") {
               elements.push(null);
-            } 
-            
+            }
+
             // Push element expression
             else {
               elements.push(expression(0, { isParameterOrElement: true }));
@@ -1827,7 +1833,7 @@ module.exports = function getTokens() {
       leftBindingPower: 0,
       nullDenotation: () => {
         let body = [];
-        variableStack.push();
+        variableStack.push(true);
 
         while (tokenArrayIndex < tokenArray.length - 1) {
           let myExpression = expression(0);
