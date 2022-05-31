@@ -84,14 +84,12 @@ module.exports = function getTokens() {
               if (this.variableScopeStack[i].hasScope) {
                 if (this.variableScopeStack[i].used[name] != true) {
                   this.variableScopeStack[i].add[name] = true;
-                  break;
-                } else {
-                  break;
                 }
+                break;
+              } else if (this.variableScopeStack[i].used[name] == true) {
+                break;
               }
             }
-            // let index = this.variableScopeStack.length >= 2 ? this.variableScopeStack.length - 2 : 0;
-            // this.variableScopeStack[index].add[name] = true;
           }
         }
       }
