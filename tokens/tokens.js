@@ -1204,6 +1204,26 @@ module.exports = function getTokens() {
     };
   };
 
+  tokens.await_expression_token = (value, props) => {
+    return {
+      name: "await_expression_token",
+      leftBindingPower: 0,
+      props: props,
+      value: value,
+      nullDenotation: () => {
+        let right = expression(0);
+        return createLocation(
+          {
+            type: "AwaitExpression",
+            argument: right,
+          },
+          null,
+          right,
+          props
+        );
+      },
+    };
+  };
   // *************************
   // Functions
   // *************************
