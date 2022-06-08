@@ -1224,6 +1224,62 @@ module.exports = function getTokens() {
       },
     };
   };
+
+  tokens.try_statement_token = (value, props) => {
+    return {
+      name: "try_statement_token",
+      leftBindingPower: 0,
+      props: props,
+      value: value,
+      nullDenotation: () => {
+        if (peekToken().name == "end_token") {
+          consumeToken("end_token");
+        }
+        let block = expression(0);
+        if (peekToken().name == "end_token") {
+          consumeToken("end_token");
+        }
+        let handler = expression(0);
+        return createLocation(
+          {
+            type: "TryStatement",
+            block: block,
+            handler: handler,
+          },
+          null,
+          handler,
+          props
+        );
+      },
+    };
+  };
+
+  tokens.catch_clause_token = (value, props) => {
+    return {
+      name: "catch_clause_token",
+      leftBindingPower: 0,
+      props: props,
+      value: value,
+      nullDenotation: () => {
+        let param = expression(0);
+        if (peekToken().name == "end_token") {
+          consumeToken("end_token");
+        }
+        let body = expression(0);
+        return createLocation(
+          {
+            type: "CatchClause",
+            param: param,
+            body: body,
+          },
+          null,
+          body,
+          props
+        );
+      },
+    };
+  };
+
   // *************************
   // Functions
   // *************************
