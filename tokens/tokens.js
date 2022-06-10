@@ -307,7 +307,7 @@ module.exports = function getTokens() {
           keyValue = tokens.identifier_token(value, props).nullDenotation();
         }
         // If this is the first property, we wrap this inside ObjectExpression
-        let propertyValue = expression(0);
+        let propertyValue = expression(0, { isParameterOrElement: true });
 
         // !TODO! This was supposed to fix the case where we have only single object expression, but seems it's working after fixes at object_expression
         // !TODO! Remove this isSingle system if found ok.
@@ -1309,12 +1309,19 @@ module.exports = function getTokens() {
         }
 
         // If return is returning block with multiple items in body, we change it into array
-        if (argument.type == "BlockStatement" && argument.body.length > 1) {
-          argument = {
-            type: "ArrayExpression",
-            elements: argument.body,
-          };
+        if (argument.type == "BlockStatement") {
+          if (argument.body.length > 1) {
+            argument = {
+              type: "ArrayExpression",
+              elements: argument.body,
+            };
+          }
+          // New feature 20220610, return does not return block statements anymore
+          else {
+            argument = argument.body[0];
+          }
         }
+
         return createNudLoc(
           {
             type: "ReturnStatement",
@@ -1819,26 +1826,16 @@ module.exports = function getTokens() {
           body = expression(5, { isArrayFunction: true, hasScope: true });
         }
 
-        // Allow using return at the same line with block to directly return something from the block. Useful in React
+        // NEW CODE 2022 06 10. return does not return blocks anymore.
         if (
-          arrowToken &&
-          body.type == "ReturnStatement" &&
-          (body.argument.type == "BlockStatement" || ((body.argument.type == "ObjectExpression" || body.argument.type == "ArrayExpression") && arrowToken.value != "=>" && arrowToken.value != "=>>"))
+          (arrowToken && body?.type == "ReturnStatement") ||
+          ((body.argument?.type == "ObjectExpression" || body.argument?.type == "ArrayExpression") && arrowToken.value != "=>" && arrowToken.value != "=>>")
         ) {
-          if (body.argument?.body?.length > 1) {
-            throw new Error("You cannot have more than one immediate return value in the block (must be at the main level)");
+          if (arrowToken.value == "->" || arrowToken.value == "->>") {
+            argument = body.argument;
+            body = { type: "BlockStatement", body: [{ type: "ReturnStatement", argument: body.argument }] };
           } else {
-            if (arrowToken.value == "->" || arrowToken.value == "->>") {
-              let argument = null;
-              if ((body.argument.type == "ObjectExpression" || body.argument.type == "ArrayExpression") && peekToken().name == "end_token") {
-                argument = body.argument;
-              } else {
-                argument = body.argument.body[0];
-              }
-              body = { type: "BlockStatement", body: [{ type: "ReturnStatement", argument: argument }] };
-            } else {
-              body = body.argument.body[0];
-            }
+            body = body.argument;
           }
         }
 
