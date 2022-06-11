@@ -1,4 +1,4 @@
-let notExpressionStatements = ["VariableDeclaration", "ImportDeclaration", "ExportNamedDeclaration", "ExportDefaultDeclaration", "ExpressionStatement", "ReturnStatement", "IfStatement"];
+let notExpressionStatements = ["VariableDeclaration", "ImportDeclaration", "ExportNamedDeclaration", "ExportDefaultDeclaration", "ExpressionStatement", "ReturnStatement", "IfStatement", "TryStatement"];
 
 module.exports = function getTokens() {
   let tokens = {};
