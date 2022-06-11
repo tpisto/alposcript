@@ -5,3 +5,4 @@ if !a && !c
   let d = a
 if not a
   b = 1
+let c = typeof g

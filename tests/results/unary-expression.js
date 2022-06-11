@@ -8,3 +8,5 @@ if (!a && !c) {
 if (!a) {
   b = 1;
 }
+
+let c = typeof g;

@@ -226,6 +226,9 @@ module.exports = class Tokenizer {
             case "not":
               this.addToken(this.t.unary_expression_token, "!", null, true);
               break;
+            case "typeof":
+              this.addToken(this.t.unary_expression_token, "typeof", null, true);
+              break;
             case "new":
               this.addToken(this.t.new_expression_token, "new", null, true);
               break;
