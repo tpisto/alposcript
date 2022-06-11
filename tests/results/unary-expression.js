@@ -17,3 +17,5 @@ getIconType = function (icon) {
     return null;
   }
 };
+
+let d = a && !b[c];

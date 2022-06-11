@@ -354,7 +354,7 @@ module.exports = function getTokens() {
       name: "member_expression_token",
       value: value,
       props: props,
-      leftBindingPower: 80,
+      leftBindingPower: 81,
       leftDenotation: (left) => {
         let right = null;
 
