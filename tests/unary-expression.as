@@ -6,3 +6,6 @@ if !a && !c
 if not a
   b = 1
 let c = typeof g
+getIconType = (icon) ->
+  if typeof icon != 'string'
+    return null

@@ -1147,7 +1147,7 @@ module.exports = function getTokens() {
       props: props,
       value: value,
       nullDenotation: () => {
-        let right = expression(70);
+        let right = expression(80);
         return createNudLoc(
           {
             type: "UnaryExpression",
