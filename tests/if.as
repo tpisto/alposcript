@@ -45,3 +45,9 @@ myFunctionCall a, b, c, if a then b else c, 10, 20, "10", if d == 1 then c else 
 let a = (b) ->* 
   if c
     yield d
+
+if a == true && b
+  let c = 1
+
+if isMounted == true && c?._id && !_.isEmpty(g) && !_.isEmpty(g[c._id])
+  let g = 2

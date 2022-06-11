@@ -479,7 +479,7 @@ module.exports = function getTokens() {
       props: props,
       leftBindingPower: 80,
       leftDenotation: (left) => {
-        let right = expression(0);
+        let right = expression(80);
         return createLocation(
           {
             type: "BinaryExpression",

@@ -60,3 +60,11 @@ let a = function* (b) {
     yield d;
   }
 };
+
+if (a === true && b) {
+  let c = 1;
+}
+
+if (isMounted === true && c?._id && !_.isEmpty(g) && !_.isEmpty(g[c._id])) {
+  let g = 2;
+}
