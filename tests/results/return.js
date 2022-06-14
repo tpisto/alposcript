@@ -5,4 +5,4 @@ function myFun(s) {
   return {
     b: a ? 2 : null
   };
-};
+}

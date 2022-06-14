@@ -6,7 +6,7 @@ function TimeLogField(props) {
       myValue = 1;
     }
   }
-};
+}
 
 function TimeLogField2(props) {
   if (true) {
@@ -16,7 +16,7 @@ function TimeLogField2(props) {
       myValue2 = 1;
     }
   }
-};
+}
 
 function TimeLogField3(props) {
   let myValue3;
@@ -26,4 +26,4 @@ function TimeLogField3(props) {
       myValue3 = 3;
     }
   }
-};
+}
