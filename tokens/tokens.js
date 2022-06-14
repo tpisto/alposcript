@@ -1623,7 +1623,22 @@ module.exports = function getTokens() {
           }
         } else {
           if (peekToken().name == "identifier_token") {
-            properties.push(expression(0, { isFirstProperty: properties.length <= 0 && props.hasBlock != true }));
+            objectProperty = expression(0, { isFirstProperty: properties.length <= 0 && props.hasBlock != true });
+            objectProperty = createNudLoc(
+              {
+                type: "ObjectProperty",
+                method: false,
+                shorthand: true,
+                extra: {
+                  shorthand: true,
+                },
+                computed: false,
+                key: objectProperty,
+                value: objectProperty,
+              },
+              props
+            );
+            properties.push(objectProperty);
           }
         }
 
@@ -1647,7 +1662,7 @@ module.exports = function getTokens() {
           }
 
           // We allow also single identifiers - that needs to be converted to object properties
-          if (nextTokenName == "identifier_token" && options?.isVariableDeclaration != true) {
+          if (nextTokenName == "identifier_token") {
             objectProperty = createNudLoc(
               {
                 type: "ObjectProperty",
