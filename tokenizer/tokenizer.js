@@ -480,7 +480,12 @@ module.exports = class Tokenizer {
             this.addToken(this.t.template_element_token, this.text.substring(pos.start, pos.end + 1));
             this.textPos = pos.end + 1;
             return true;
-          } else if (pos.type == "expression") {
+          } 
+          else if (pos.type == "empty_quasis") {
+            this.addToken(this.t.template_element_token, "");
+            continue;
+          } 
+          else if (pos.type == "expression") {
             if (this.text[this.textPos] == "#") {
               this.addToken(this.t.template_expression_token, "#{");
               this.textPos = this.textPos + 2;

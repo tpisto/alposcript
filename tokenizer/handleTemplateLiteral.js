@@ -46,7 +46,7 @@ module.exports = function handleTemplateLiteral(text, textPos) {
   }
 
   if (hasTemplates) {
-    if(quasisStart != null) {
+    if (quasisStart != null) {
       templatePositions.push({ start: quasisStart, end: i - 1, type: "last" });
     } else {
       let last = templatePositions[templatePositions.length - 1];
@@ -56,6 +56,15 @@ module.exports = function handleTemplateLiteral(text, textPos) {
     if (templatePositions[0].type == "expression") {
       templatePositions.unshift({ start: templatePositions[0].start, end: templatePositions[0].start, type: "first" });
     }
+
+    // Push empty quasis between two expressions if there is no quasis between them
+    for (let i = 1; i < templatePositions.length; i++) {
+      if (templatePositions[i].type == "expression" && templatePositions[i - 1].type == "expression") {
+        templatePositions.splice(i, 0, { start: templatePositions[i - 1].end + 1, end: templatePositions[i - 1].end + 1, type: "empty_quasis" });
+        i = i + 1;
+      }
+    }
+
     return templatePositions;
   } else {
     return [];
