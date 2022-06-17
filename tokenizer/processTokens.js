@@ -274,18 +274,43 @@ module.exports = function processTokens(tokens, myTokenArray) {
       myTokenArray[i + 1] = convertToken(tokens.object_expression_token, myTokenArray[i + 1]);
     }
 
-    // Convert single line member expression to be part of previous line or token
-    if (myTokenArray[i].name == "end_token" && myTokenArray[i + 1].name == "member_expression_token") {
-      myTokenArray.splice(i, 1);
-      i = i - 1;
-      // We want this to bind at the very and of the previous block
-      myTokenArray[i + 1].leftBindingPower = 5;
-    }
+    // All end_token related actions here
+    if (myTokenArray[i].name == "end_token") {
+      if (myTokenArray[i + 1].name == "member_expression_token") {
+        // Convert single line member expression to be part of previous line or token
+        myTokenArray.splice(i, 1);
+        i = i - 1;
+        // We want this to bind at the very and of the previous block
+        myTokenArray[i + 1].leftBindingPower = 5;
+      }
 
-    // Remove multiple end tokens
-    if (myTokenArray[i].name == "end_token" && myTokenArray[i + 1].name == "end_token") {
-      myTokenArray.splice(i, 1);
-      i--;
+      // Remove multiple end tokens
+      if (myTokenArray[i + 1].name == "end_token") {
+        myTokenArray.splice(i, 1);
+        i--;
+      }
+
+      // Handle case where you have for example then at the block, like:
+      // let a = b(c)
+      //   .then (a) -> cde
+      //   .then (c) -> def
+      if (myTokenArray[i + 1].name == "block_token" && myTokenArray[i + 1].value == "INDENT" && myTokenArray[i + 2].name == "member_expression_token") {
+        myTokenArray.splice(i, 2);
+        i = i - 2;
+        // Clean also the DEDENT
+        let indentCount = 0;
+        for (let j = i + 1; j < myTokenArray.length; j++) {
+          indentCount = indentCount + (myTokenArray[j].value == "INDENT" ? 1 : 0);
+          if (myTokenArray[j].name == "block_token" && myTokenArray[j].value == "DEDENT") {
+            if (indentCount == 0) {
+              myTokenArray.splice(j, 1);
+              j--;
+            } else {
+              indentCount--;
+            }
+          }
+        }
+      }
     }
 
     // "export default"

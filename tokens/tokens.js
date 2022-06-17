@@ -1499,6 +1499,7 @@ module.exports = function getTokens() {
       nullDenotation: (callee) => {
         let params = getCallParameters();
         let myCallee = callee?.type == "CallExpression" ? callee : token.nullDenotation();
+
         return createLocation(
           {
             type: "CallExpression",

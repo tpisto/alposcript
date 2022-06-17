@@ -189,7 +189,9 @@ module.exports = class Tokenizer {
           break;
         default:
           // String tokens
+          let previousCharacter = this.text.charAt(this.textPos - 1);
           let tmpTokenString = this.consumeString([" ", TERM, INDENT, DEDENT, "\n", ",", ".", ":", ";", "(", ")", "[", "]", "{", "}", "?", "+"], this.text);
+
           switch (tmpTokenString) {
             // Keywords
             case "let":
@@ -205,7 +207,11 @@ module.exports = class Tokenizer {
               this.addToken("else_token", tmpTokenString, null, true);
               break;
             case "then":
-              this.addToken("then_token", tmpTokenString, null, true);
+              if (previousCharacter != ".") {
+                this.addToken("then_token", tmpTokenString, null, true);
+              } else {
+                this.addToken(this.t.call_expression_token, tmpTokenString, null, true);
+              }
               break;
             case "import":
               this.addToken(this.t.import_declaration_token, tmpTokenString, null, true);
@@ -480,12 +486,10 @@ module.exports = class Tokenizer {
             this.addToken(this.t.template_element_token, this.text.substring(pos.start, pos.end + 1));
             this.textPos = pos.end + 1;
             return true;
-          } 
-          else if (pos.type == "empty_quasis") {
+          } else if (pos.type == "empty_quasis") {
             this.addToken(this.t.template_element_token, "");
             continue;
-          } 
-          else if (pos.type == "expression") {
+          } else if (pos.type == "expression") {
             if (this.text[this.textPos] == "#") {
               this.addToken(this.t.template_expression_token, "#{");
               this.textPos = this.textPos + 2;
