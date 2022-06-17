@@ -1857,7 +1857,7 @@ module.exports = function getTokens() {
         // the final expression in the function will be used as return value. Rust is awesome language, so let's do it their way.
         // CoffeeScript and LiveScript also has this feature, but they have more extreme "everything is an expression" rules.
         // !TODO! Do not create it here, but instead tell to the expressions also that they can be used as return value.
-        if (body.type == "BlockStatement" && body.body.length > 0) {
+        if (body.type == "BlockStatement" && body.body.length > 0 && arrowToken.props?.options?.disableImplicitReturn != true) {
           let lastElement = body.body[body.body.length - 1];
 
           // IF last element is expression, then we can use it as return value by converting ExpressionStatement to ReturnStatement

@@ -26,6 +26,8 @@ module.exports = class Tokenizer {
     // Yes, it could be simpler just to split first tokens using regexp.
     // But I want to keep full control about tokenazion using just plain javascript. It's actually pretty convenient
     textLoop: for (this.textPos; this.textPos < this.text.length; ) {
+      let disableImplicitReturn = false;
+
       if (this.processTemplateLiterals()) {
         continue textLoop;
       }
@@ -95,20 +97,25 @@ module.exports = class Tokenizer {
           }
           break;
         case "!":
-          if (this.testAndEatFoundChar(this.text, "=")) {
-            this.addToken(this.t.binary_expression_token, "!==");
+          // If this is to prevent function implicit return
+          if ((this.peekChar(this.text) == "=" || this.peekChar(this.text) == "-") && this.peekChar(this.text, 2) == ">") {
           } else {
-            this.addToken(this.t.unary_expression_token, "!");
+            if (this.testAndEatFoundChar(this.text, "=")) {
+              this.addToken(this.t.binary_expression_token, "!==");
+            } else {
+              this.addToken(this.t.unary_expression_token, "!");
+            }
           }
           break;
         case "=":
+          disableImplicitReturn = this.peekChar(this.text, -1) == "!";
           // !TODO! refactor this
           if (this.testAndEatFoundChar(this.text, ">")) {
             if (this.text.charAt(this.textPos + 1) == ">") {
-              this.addToken("arrow_token", "=>>");
+              this.addToken("arrow_token", "=>>", { disableImplicitReturn });
               this.advanceString();
             } else {
-              this.addToken("arrow_token", "=>");
+              this.addToken("arrow_token", "=>", { disableImplicitReturn });
             }
           } else if (this.testAndEatFoundChar(this.text, "=")) {
             this.addToken(this.t.binary_expression_token, "===");
@@ -117,16 +124,17 @@ module.exports = class Tokenizer {
           }
           break;
         case "-":
+          disableImplicitReturn = this.peekChar(this.text, -1) == "!";
           // !TODO! refactor this
           if (this.testAndEatFoundChar(this.text, ">")) {
             if (this.peekChar(this.text) == ">") {
-              this.addToken("arrow_token", "->>");
+              this.addToken("arrow_token", "->>", { disableImplicitReturn });
               this.advanceString();
             } else if (this.peekChar(this.text) == "*") {
-              this.addToken("arrow_token", "->*");
+              this.addToken("arrow_token", "->*", { disableImplicitReturn });
               this.advanceString();
             } else {
-              this.addToken("arrow_token", "->");
+              this.addToken("arrow_token", "->", { disableImplicitReturn });
             }
           } else {
             this.addToken(this.t.operator_sub_token, "-");
