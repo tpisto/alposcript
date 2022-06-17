@@ -1299,7 +1299,7 @@ module.exports = function getTokens() {
       leftBindingPower: 0,
       props: props,
       nullDenotation: (options) => {
-        if ((peekToken(1).name == "end_token" && peekToken(2).name == "block_token") || peekToken(2).name == "object_expression_token") {
+        if (peekToken(1).name == "end_token" && (peekToken(2).name == "block_token" || peekToken(2).name == "object_expression_token")) {
           consumeToken("end_token");
         }
         // handle case where we use do before block: return_token do_token end_token block_token

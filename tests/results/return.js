@@ -6,3 +6,10 @@ function myFun(s) {
     b: a ? 2 : null
   };
 }
+
+return ({
+  a,
+  b
+}) => {
+  let c = 1;
+};
