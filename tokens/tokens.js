@@ -128,7 +128,7 @@ module.exports = function getTokens() {
       return left;
     } catch (error) {
       // For debugging (at this point, will be removed asap)
-      console.log("ERROR", error);
+      // console.log("ERROR", error);
 
       let token = peekToken();
       // !TODO! Allow better error messages. Now error messages that tokens are emitting, are not shown =(
@@ -425,25 +425,6 @@ module.exports = function getTokens() {
       },
     };
   };
-
-  // tokens.member_expression_computed_token = (value, props) => {
-  //   return {
-  //     name: "member_expression_token",
-  //     value: value,
-  //     props: props,
-  //     leftBindingPower: 80,
-  //     leftDenotation: (left) => {
-  //       let right = expression(200);
-
-  //       return {
-  //         type: "MemberExpression",
-  //         object: left,
-  //         property: right,
-  //         computed: true,
-  //       };
-  //     },
-  //   };
-  // };
 
   tokens.export_token = (value, props) => {
     return {
@@ -1888,6 +1869,30 @@ module.exports = function getTokens() {
           // If last element is ObjectExpression, then we can use it as return value by adding ReturnStatement
           else if (lastElement.type == "ObjectExpression") {
             body.body[body.body.length - 1] = createLocation({ type: "ReturnStatement", argument: lastElement }, lastElement, lastElement, props);
+          } else if (lastElement.type == "IfStatement") {
+            // This is pretty hard. I thought that maybe we could do the if branch converting in if token, but seems
+            // it's easiest to understand the block structure in this point and do the conversions.
+
+            // Convert all if token branch block last elements into return statements
+            // !TODO! Convert also try catch blocks the same way.
+            let convertIfBranches = (branch) => {
+              // We should convert both alternate and consequent blocks
+              for (type of ["consequent", "alternate"]) {
+                if (branch[type]?.type == "IfStatement") {
+                  convertIfBranches(branch[type]);
+                } else if (branch[type]?.type == "BlockStatement") {
+                  let lastElement = branch[type].body[branch[type].body.length - 1];
+                  if (lastElement.type == "ExpressionStatement") {
+                    lastElement.type = "ReturnStatement";
+                    lastElement.argument = lastElement.expression;
+                    delete lastElement.expression;
+                  } else if (lastElement.type == "IfStatement") {
+                    convertIfBranches(lastElement);
+                  }
+                }
+              }
+            };
+            convertIfBranches(lastElement);
           }
         }
 

@@ -57,7 +57,7 @@ myFunctionCall(a, b, c, a ? b : c, 10, 20, "10", d === 1 ? c : g);
 
 let a = function* (b) {
   if (c) {
-    yield d;
+    return yield d;
   }
 };
 
