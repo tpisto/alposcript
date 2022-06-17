@@ -1,4 +1,4 @@
-let b, d, f;
+let b, d, f, x;
 
 if (a !== b) {
   return a;
@@ -67,4 +67,12 @@ if (a === true && b) {
 
 if (isMounted === true && c?._id && !_.isEmpty(g) && !_.isEmpty(g[c._id])) {
   let g = 2;
+}
+
+if (a) {
+  x = 1;
+} else if (b) {
+  x = 2;
+} else {
+  x = 3;
 }

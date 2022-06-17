@@ -128,7 +128,7 @@ module.exports = function getTokens() {
       return left;
     } catch (error) {
       // For debugging (at this point, will be removed asap)
-      // console.log("ERROR", error);
+      console.log("ERROR", error);
 
       let token = peekToken();
       // !TODO! Allow better error messages. Now error messages that tokens are emitting, are not shown =(
@@ -820,7 +820,9 @@ module.exports = function getTokens() {
         } else {
           // Make sure that consequent and alternate are created as blocks (babel generator will not do that)
           consequent = wrapIntoBlockStatementIfNotBlock(consequent);
-          alternate = wrapIntoBlockStatementIfNotBlock(alternate);
+          if (alternate?.type != "IfStatement") {
+            alternate = wrapIntoBlockStatementIfNotBlock(alternate);
+          }
 
           return createNudLoc(
             {
