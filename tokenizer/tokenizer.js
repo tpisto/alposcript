@@ -162,7 +162,7 @@ module.exports = class Tokenizer {
             this.textPos = this.textPos - 2;
           } else {
             let currentPosition = { line: this.line, column: this.column, textPos: this.textPos };
-            this.addToken(this.t.literal_token, `\"${this.consumeString(['"'], this.text, true)}\"`, { type: "string", ...currentPosition });
+            this.addToken(this.t.literal_token, this.consumeString(['"'], this.text, true), { type: "string", ...currentPosition });
           }
           this.column++;
           this.textPos++;
@@ -171,7 +171,7 @@ module.exports = class Tokenizer {
           this.column++;
           this.textPos++;
           let currentPosition = { line: this.line, column: this.column, textPos: this.textPos };
-          this.addToken(this.t.literal_token, `'${this.consumeString(["'"], this.text, true)}'`, {
+          this.addToken(this.t.literal_token, this.consumeString(["'"], this.text, true), {
             type: "string",
             ...currentPosition,
           });
@@ -226,7 +226,7 @@ module.exports = class Tokenizer {
               this.addToken(this.t.return_statement_token, tmpTokenString, null, true);
               break;
             case "null":
-              this.addToken(this.t.literal_token, tmpTokenString, null, true);
+              this.addToken(this.t.literal_token, tmpTokenString, { type: "null" }, true);
               break;
             case "for":
               this.addToken(this.t.for_statement_token, tmpTokenString, null, true);
@@ -444,6 +444,7 @@ module.exports = class Tokenizer {
           column: this.column + 1 - token.length,
           length: token.length,
           type: options?.type,
+          options: options,
         };
       } else {
         props = {

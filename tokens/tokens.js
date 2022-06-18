@@ -215,20 +215,18 @@ module.exports = function getTokens() {
       props: props,
       leftBindingPower: 0,
       nullDenotation: () => {
-        if (isNaN(value)) {
+        if (props.options && (props.options.type == "string" || props.options.type == "null")) {
           // String that does not contain any templates
-          // else {
           return createNudLoc(
             {
               type: value == "null" ? "NullLiteral" : "StringLiteral",
-              value: value.substring(1, value.length - 1),
+              value: value,
               extra: {
                 raw: value,
               },
             },
             props
           );
-          // }
         } else {
           return createNudLoc(
             {
