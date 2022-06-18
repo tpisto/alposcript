@@ -221,7 +221,7 @@ module.exports = function getTokens() {
           return createNudLoc(
             {
               type: value == "null" ? "NullLiteral" : "StringLiteral",
-              value: value.replace(/['"]+/g, ""),
+              value: value.substring(1, value.length - 1),
               extra: {
                 raw: value,
               },

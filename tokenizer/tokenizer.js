@@ -162,7 +162,7 @@ module.exports = class Tokenizer {
             this.textPos = this.textPos - 2;
           } else {
             let currentPosition = { line: this.line, column: this.column, textPos: this.textPos };
-            this.addToken(this.t.literal_token, `\"${this.consumeString(['"'], this.text)}\"`, { type: "string", ...currentPosition });
+            this.addToken(this.t.literal_token, `\"${this.consumeString(['"'], this.text, true)}\"`, { type: "string", ...currentPosition });
           }
           this.column++;
           this.textPos++;
@@ -171,7 +171,7 @@ module.exports = class Tokenizer {
           this.column++;
           this.textPos++;
           let currentPosition = { line: this.line, column: this.column, textPos: this.textPos };
-          this.addToken(this.t.literal_token, `'${this.consumeString(["'"], this.text)}'`, {
+          this.addToken(this.t.literal_token, `'${this.consumeString(["'"], this.text, true)}'`, {
             type: "string",
             ...currentPosition,
           });
@@ -375,16 +375,24 @@ module.exports = class Tokenizer {
     this.textPos++;
   }
 
-  consumeString(findChars, myText) {
+  consumeString(findChars, myText, allowEscape = false) {
     let result = "";
     let i;
     for (i = this.textPos; i < myText.length; i++) {
       let letter = myText.charAt(i);
-      for (let char of findChars) {
-        if (letter == char) {
-          this.column--;
-          this.textPos--;
-          return result;
+      // Allow escape characters in strings
+      if (allowEscape && i > 0 && letter == "\\") {
+        this.column++;
+        this.textPos++;
+        i++;
+        letter = myText.charAt(i);
+      } else {
+        for (let char of findChars) {
+          if (letter == char) {
+            this.column--;
+            this.textPos--;
+            return result;
+          }
         }
       }
       result = result + letter;
