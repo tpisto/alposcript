@@ -9,4 +9,6 @@ let c = typeof g
 getIconType = (icon) ->
   if typeof icon != 'string'
     return null
-let d = a && !b[c]    
+let d = a && !b[c]
+fn h() ->
+  j !k

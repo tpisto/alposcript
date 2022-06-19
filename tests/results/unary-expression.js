@@ -19,3 +19,7 @@ getIconType = function (icon) {
 };
 
 let d = a && !b[c];
+
+function h() {
+  return j(!k);
+}
