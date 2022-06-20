@@ -1966,6 +1966,7 @@ module.exports = function getTokens() {
           body: body,
           sourceType: sourceType,
           interpreter: null,
+          directives: [],
           start: 0,
           end: lastBodyElement.end,
           loc: {
