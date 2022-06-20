@@ -288,11 +288,20 @@ module.exports = class Tokenizer {
                 // We whould skip computed member expression [a]: 1
                 if (this.peekChar(this.text, 0) != "]") {
                   // Allow using reserved words as object property names
+                  // Allow literal token pass through.
+                  let literalToken = null;
                   if (tmpTokenString.length == 0) {
-                    tmpTokenString = this.tokenArray[this.tokenArray.length - 1].value;
-                    this.tokenArray.splice(this.tokenArray.length - 1, 1);
+                    let token = this.tokenArray.splice(this.tokenArray.length - 1, 1);
+                    if (token[0].name != "literal_token") {
+                      tmpTokenString = token[0].value;
+                    } else {
+                      literalToken = token[0];
+                    }
                   }
-                  tmpTokenString = this.addToken(this.t.object_property_token, tmpTokenString);
+                  tmpTokenString = this.addToken(this.t.object_property_token, tmpTokenString, { hasLiteralKey: literalToken != null });
+                  if (literalToken) {
+                    this.tokenArray.push(literalToken);
+                  }
                 } else {
                   this.addToken("colon_token", ":");
                 }

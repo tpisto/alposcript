@@ -312,7 +312,11 @@ module.exports = function getTokens() {
             consumeToken("array_token", "]");
           }
         } else {
-          keyValue = tokens.identifier_token(value, props).nullDenotation();
+          if (props.options?.hasLiteralKey) {
+            keyValue = expression(0);
+          } else {
+            keyValue = tokens.identifier_token(value, props).nullDenotation();
+          }
         }
         // If this is the first property, we wrap this inside ObjectExpression
         let propertyValue = expression(0, { isParameterOrElement: true });
