@@ -6,3 +6,8 @@ fetch(a).then(b => {
   h("i");
   return j("k");
 });
+app.then(1);
+
+function a() {
+  return app.then(1);
+}

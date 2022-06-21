@@ -11,3 +11,10 @@ fetch(a)
   .then (g) =>
     h 'i'
     j 'k'
+
+app
+  .then 1
+
+fn a() ->
+  app
+    .then 1

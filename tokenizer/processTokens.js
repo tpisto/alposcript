@@ -305,7 +305,7 @@ module.exports = function processTokens(tokens, myTokenArray) {
           if (myTokenArray[j].name == "block_token" && myTokenArray[j].value == "DEDENT") {
             if (indentCount == 0) {
               myTokenArray.splice(j, 1);
-              j--;
+              break;
             } else {
               indentCount--;
             }
