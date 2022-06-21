@@ -78,6 +78,7 @@ module.exports = function processTokens(tokens, myTokenArray) {
         nextTokenName == "identifier_token" ||
         nextTokenName == "this_token" ||
         nextTokenName == "arrow_token" ||
+        nextTokenName == "await_expression_token" ||
         nextTokenName == "literal_token" ||
         (nextTokenName == "array_token" && nextToken.value == "[" && nextToken.props.noWhitespace != true) ||
         nextTokenName == "object_property_token" ||
