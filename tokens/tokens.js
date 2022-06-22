@@ -313,7 +313,7 @@ module.exports = function getTokens() {
           }
         } else {
           if (props.options?.hasLiteralKey) {
-            keyValue = expression(0);
+            keyValue = expression(999);
           } else {
             keyValue = tokens.identifier_token(value, props).nullDenotation();
           }
