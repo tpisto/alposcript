@@ -391,7 +391,7 @@ module.exports = function getTokens() {
         }
 
         return {
-          type: value == "?." ? "OptionalMemberExpression" : "MemberExpression",
+          type: value == "?." || left.type == 'OptionalMemberExpression' ? "OptionalMemberExpression" : "MemberExpression",
           object: left,
           property: right,
           computed: props.computed == true,
@@ -1517,7 +1517,7 @@ module.exports = function getTokens() {
         let params = getCallParameters();
         return createLocation(
           {
-            type: "CallExpression",
+            type: left.type == "OptionalMemberExpression" ? "OptionalCallExpression" : "CallExpression",
             callee: left,
             arguments: params,
           },
