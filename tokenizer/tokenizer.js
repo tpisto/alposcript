@@ -77,6 +77,18 @@ module.exports = class Tokenizer {
           }
           break;
         case "/":
+          // Check that if this is regular expression
+          // For performance reasons maximum length for regexp is 50 characters
+          if (this.peekChar(this.text) != " ") {
+            // Check if this is regular expression using regular expression. Return patter and flags as match groups.
+            let regexpMatch = this.text.substring(this.textPos, this.textPos + 50).match(/^\/(.*?)\/([igmsuy]*)/);
+            if (regexpMatch) {
+              this.addToken(this.t.regexp_literal_token, "/" + regexpMatch[1] + "/" + regexpMatch[2], { pattern: regexpMatch[1], flags: regexpMatch[2] });
+              this.textPos += regexpMatch[0].length;
+              this.column += regexpMatch[0].length;
+              continue textLoop;
+            }
+          }
           this.addToken(this.t.operator_div_token, "/");
           break;
         case "%":

@@ -279,6 +279,25 @@ module.exports = function getTokens() {
     };
   };
 
+  tokens.regexp_literal_token = (value, props) => {
+    return {
+      name: "regexp_literal_token",
+      value: value,
+      props: props,
+      leftBindingPower: 0,
+      nullDenotation: () => {
+        return createNudLoc(
+          {
+            type: "RegExpLiteral",
+            pattern: props.options.pattern,
+            flags: props.options.flags,
+          },
+          props
+        );
+      },
+    };
+  };
+
   tokens.object_property_token = (value, props) => {
     function getPropertyStructure(value, props, propertyValue, keyValue) {
       let token = {
@@ -391,7 +410,7 @@ module.exports = function getTokens() {
         }
 
         return {
-          type: value == "?." || left.type == 'OptionalMemberExpression' ? "OptionalMemberExpression" : "MemberExpression",
+          type: value == "?." || left.type == "OptionalMemberExpression" ? "OptionalMemberExpression" : "MemberExpression",
           object: left,
           property: right,
           computed: props.computed == true,

@@ -86,6 +86,7 @@ module.exports = function processTokens(tokens, myTokenArray) {
         (nextTokenName == "block_token" && nextToken.value == "{") ||
         nextTokenName == "do_token" ||
         nextTokenName == "unary_expression_token" ||
+        nextTokenName == "regexp_literal_token" ||
         nextTokenName == "template_literal_token"
       ) {
         // We can use "do" keyword to call indented blocks
@@ -114,6 +115,11 @@ module.exports = function processTokens(tokens, myTokenArray) {
     // Convert )( to call. // We can have a(1)(2)(3) calls
     if (myTokenArray[i].name == "parenthesis_close_token" && myTokenArray[i + 1].name == "parenthesis_open_token") {
       myTokenArray[i + 1] = convertToken(tokens.parenthesized_call_expression_token, myTokenArray[i + 1]);
+    }
+    // Convert )[ to member expression. // We can have a(1)[2] calls
+    if (myTokenArray[i].name == "parenthesis_close_token" && myTokenArray[i + 1].name == "array_token" && myTokenArray[i + 1].value == "[") {
+      myTokenArray[i + 1].props.computed = true;
+      myTokenArray[i + 1] = convertToken(tokens.member_expression_token, myTokenArray[i + 1]);
     }
 
     // For
