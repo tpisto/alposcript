@@ -9,3 +9,4 @@ let h = `tulos: ${a}hi`;
 let i = `test: ${c + 1}and ${d / 2}hi`;
 let j = `${c + 1}and ${d / 2}hi`;
 let k = `${cde}${fgh}`;
+let l = `${a ? "a" : "b"} and ${d / 2}hi`;

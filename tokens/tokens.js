@@ -203,7 +203,7 @@ module.exports = function getTokens() {
       props: props,
       leftBindingPower: 0,
       nullDenotation: () => {
-        return expression(0);
+        return expression(0, { isParameterOrElement: true });
       },
     };
   };
