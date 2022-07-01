@@ -1570,6 +1570,14 @@ module.exports = function getTokens() {
             if (isBlock && peekToken().name == "end_token") {
               consumeToken("end_token");
             } else {
+              // We have trailing comma on array block
+              if (isBlock && peekToken().name == "comma_token" && peekToken(2).name == "end_token" && peekToken(3).name == "block_token" && peekToken(4).name == "end_token") {
+                consumeToken("comma_token");
+                consumeToken("end_token");
+                consumeToken("block_token");
+                consumeToken("end_token");
+                break;
+              }
               consumeToken("comma_token");
             }
           }

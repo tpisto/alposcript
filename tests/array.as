@@ -11,3 +11,8 @@ let b = [
   $ 'b'
   $ 'c'
 ]
+# Trailing comma
+columns = [
+  { a: 1 },
+  { b: 2 }, 
+]
