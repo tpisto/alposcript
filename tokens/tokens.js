@@ -913,7 +913,12 @@ module.exports = function getTokens() {
       leftBindingPower: 90,
       leftDenotation: (left) => {
         let right;
-        variableStack.set(left.name);
+
+        // := operator prevents to auto-assign into scope. Otherwise we set variable into stack.
+        if (props.options.doNotAddToScope != true) {
+          variableStack.set(left.name);
+        }
+
         // Allow define object properies in the next line
         if (peekToken(1).name == "end_token" && peekToken(2).name == "block_token" && (peekToken(3).name == "object_expression_token" || peekToken(3).name == "object_property_token")) {
           consumeToken("end_token");
