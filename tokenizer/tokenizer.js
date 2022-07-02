@@ -209,8 +209,8 @@ module.exports = class Tokenizer {
             case "let":
               this.addToken(this.t.variable_declarator_token, tmpTokenString, null, true);
               break;
-            case "_var":
-              this.addToken(this.t.variable_declarator_token, tmpTokenString.substring(1), null, true);
+            case "var":
+              this.addToken(this.t.variable_declarator_token, tmpTokenString, null, true);
               break;
             case "const":
               this.addToken(this.t.variable_declarator_token, tmpTokenString, null, true);
