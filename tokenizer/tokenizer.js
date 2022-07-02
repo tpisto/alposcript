@@ -300,8 +300,13 @@ module.exports = class Tokenizer {
             default:
               let nextToken = this.peekChar(this.text);
               if (nextToken === ":") {
+                // := operator
+                if (this.peekChar(this.text, 2) == "=") {
+                  this.addToken(this.t.assignment_expression_token, "=", { doNotAddToScope: true }, true);
+                  this.advanceString();
+                }
                 // We whould skip computed member expression [a]: 1
-                if (this.peekChar(this.text, 0) != "]") {
+                else if (this.peekChar(this.text, 0) != "]") {
                   // Allow using reserved words as object property names
                   // Allow literal token pass through.
                   let literalToken = null;

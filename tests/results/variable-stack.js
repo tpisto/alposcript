@@ -27,3 +27,11 @@ function TimeLogField3(props) {
     }
   }
 }
+
+function TimeLogField4(props) {
+  if (true) {
+    if (true) {
+      return myValue4 = 3;
+    }
+  }
+}

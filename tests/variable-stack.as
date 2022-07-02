@@ -15,3 +15,8 @@ fn TimeLogField3(props) ->
   if true
     if true
       myValue3 = 3
+
+fn TimeLogField4(props) ->
+  if true
+    if true
+      myValue4 := 3
