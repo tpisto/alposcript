@@ -446,11 +446,16 @@ module.exports = class Tokenizer {
       },
     };
     this.commentArray.push(comment);
-    this.advanceString();
-    if ([TERM, INDENT, DEDENT, "\n"].includes(myText[this.textPos])) {
-      // We should change line if we have line change in commet
-      this.line++;
-      this.column = 0;
+
+    // Check if there is only comment in this line. If yes, we also consume the newline
+    let lastToken = this.tokenArray[this.tokenArray.length - 1];
+    if (lastToken != "program_token" && lastToken.props.line != this.line) {
+      this.advanceString();
+      if ([TERM, INDENT, DEDENT, "\n"].includes(myText[this.textPos])) {
+        // We should change line if we have line change in commet
+        this.line++;
+        this.column = 0;
+      }
     }
   }
 
