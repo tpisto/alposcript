@@ -243,6 +243,15 @@ module.exports = class Tokenizer {
             case "for":
               this.addToken(this.t.for_statement_token, tmpTokenString, null, true);
               break;
+            case "switch":
+              this.addToken(this.t.switch_statement_token, tmpTokenString, null, true);
+              break;
+            case "case":
+              this.addToken(this.t.switch_case_token, tmpTokenString, null, true);
+              break;
+            case "default":
+              this.addToken(this.t.switch_case_token, tmpTokenString, { type: "default" }, true);
+              break;
             case "of":
               this.addToken("of_token", tmpTokenString, null, true);
               break;
@@ -272,10 +281,14 @@ module.exports = class Tokenizer {
               this.addToken(this.t.binary_expression_token, tmpTokenString, null, true);
               break;
             case "export":
-              this.addToken(this.t.export_token, tmpTokenString, null, true);
-              break;
-            case "default":
-              this.addToken("default", tmpTokenString, null, true);
+              // Check if export_token is default by using regexp if next chars are default
+              if (this.text.substr(this.textPos + 1, 8) === " default") {
+                this.addToken(this.t.export_token, tmpTokenString, { type: "default" }, true);
+                this.column = this.column + 8;
+                this.textPos = this.textPos + 8;
+              } else {
+                this.addToken(this.t.export_token, tmpTokenString, null, true);
+              }
               break;
             case "yield":
               this.addToken(this.t.yield_expression_token, tmpTokenString, null, true);

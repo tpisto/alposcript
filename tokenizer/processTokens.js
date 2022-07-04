@@ -87,6 +87,7 @@ module.exports = function processTokens(tokens, myTokenArray) {
         nextTokenName == "do_token" ||
         nextTokenName == "unary_expression_token" ||
         nextTokenName == "regexp_literal_token" ||
+        nextTokenName == "switch_statement_token" ||
         nextTokenName == "template_literal_token"
       ) {
         // We can use "do" keyword to call indented blocks
@@ -319,12 +320,6 @@ module.exports = function processTokens(tokens, myTokenArray) {
           }
         }
       }
-    }
-
-    // "export default"
-    if (myTokenArray[i].name == "export_token" && myTokenArray[i + 1].name == "default") {
-      myTokenArray[i].props.default = true;
-      myTokenArray.splice(i + 1, 1);
     }
   }
 

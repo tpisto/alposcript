@@ -8,6 +8,8 @@ let notExpressionStatements = [
   "IfStatement",
   "TryStatement",
   "FunctionDeclaration",
+  "SwitchCase",
+  "SwitchStatement",
 ];
 
 module.exports = function getTokens() {
@@ -298,6 +300,109 @@ module.exports = function getTokens() {
     };
   };
 
+  tokens.switch_statement_token = (value, props) => {
+    return {
+      name: "switch_statement_token",
+      value: value,
+      props: props,
+      leftBindingPower: 0,
+      nullDenotation: (options) => {
+        discriminant = expression(0);
+        consumeToken("end_token");
+        cases = expression(0, options);
+
+        // Check that cases has been at block
+        if (cases.type == "BlockStatement") {
+          cases = cases.body;
+        } else {
+          throw new Error("Cases must be in a block");
+        }
+
+        // Normal switch statement
+        switchStatement = createLocation(
+          {
+            type: "SwitchStatement",
+            discriminant: discriminant,
+            cases: cases,
+          },
+          discriminant,
+          cases[cases.length - 1],
+          props
+        );
+
+        // We need to do quite massive wrapping if we want to support switch statement -> expression conversion
+        if (options?.isParameterOrElement) {
+          // Wrap consequent into CallExpression and ArrowFunctionExpression
+          switchStatement = createLocation(
+            {
+              type: "CallExpression",
+              callee: createLocation(
+                {
+                  type: "ArrowFunctionExpression",
+                  params: [],
+                  body: createLocation(
+                    {
+                      type: "BlockStatement",
+                      body: [switchStatement],
+                    },
+                    switchStatement,
+                    switchStatement,
+                    props
+                  ),
+                },
+                switchStatement,
+                switchStatement,
+                props
+              ),
+              arguments: [],
+            },
+            switchStatement,
+            switchStatement,
+            props
+          );
+        }
+
+        return switchStatement;
+      },
+    };
+  };
+
+  tokens.switch_case_token = (value, props) => {
+    return {
+      name: "switch_case_token",
+      value: value,
+      props: props,
+      leftBindingPower: 0,
+      nullDenotation: (options) => {
+        if (props.type == "default") {
+          test = null;
+        } else {
+          test = expression(0);
+        }
+        consumeToken("end_token");
+        consequent = expression(0);
+
+        // Check that consequent has been at block
+        if (consequent.type == "BlockStatement") {
+          // If we have switch experession, cases should return value
+          if (options?.isParameterOrElement) {
+            convertBlockIntoExpressionInPlace(consequent);
+            consequent = consequent.body;
+          } else {
+            consequent = consequent.body;
+          }
+          lastToken = consequent[consequent.length - 1];
+          // Add break token to consequent (auto-break)
+          consequent.push(createLocation({ type: "BreakStatement", label: null }, lastToken, lastToken, props));
+        } else {
+          throw new Error("Case must have a block");
+        }
+
+        return createNudLoc({ type: "SwitchCase", test: test, consequent: consequent }, props);
+      },
+    };
+  };
+
   tokens.object_property_token = (value, props) => {
     function getPropertyStructure(value, props, propertyValue, keyValue) {
       let token = {
@@ -455,7 +560,7 @@ module.exports = function getTokens() {
       nullDenotation: (options) => {
         sourceType = "module";
         let right = expression(0);
-        if (props.default) {
+        if (props.type == "default") {
           return createLocation(
             {
               type: "ExportDefaultDeclaration",
@@ -1893,42 +1998,7 @@ module.exports = function getTokens() {
         // CoffeeScript and LiveScript also has this feature, but they have more extreme "everything is an expression" rules.
         // !TODO! Do not create it here, but instead tell to the expressions also that they can be used as return value.
         if (body.type == "BlockStatement" && body.body.length > 0 && arrowToken.props?.options?.disableImplicitReturn != true) {
-          let lastElement = body.body[body.body.length - 1];
-
-          // IF last element is expression, then we can use it as return value by converting ExpressionStatement to ReturnStatement
-          if (lastElement.type == "ExpressionStatement") {
-            lastElement.type = "ReturnStatement";
-            lastElement.argument = lastElement.expression;
-            delete lastElement.expression;
-          }
-          // If last element is ObjectExpression, then we can use it as return value by adding ReturnStatement
-          else if (lastElement.type == "ObjectExpression") {
-            body.body[body.body.length - 1] = createLocation({ type: "ReturnStatement", argument: lastElement }, lastElement, lastElement, props);
-          } else if (lastElement.type == "IfStatement") {
-            // This is pretty hard. I thought that maybe we could do the if branch converting in if token, but seems
-            // it's easiest to understand the block structure in this point and do the conversions.
-
-            // Convert all if token branch block last elements into return statements
-            // !TODO! Convert also try catch blocks the same way.
-            let convertIfBranches = (branch) => {
-              // We should convert both alternate and consequent blocks
-              for (type of ["consequent", "alternate"]) {
-                if (branch[type]?.type == "IfStatement") {
-                  convertIfBranches(branch[type]);
-                } else if (branch[type]?.type == "BlockStatement") {
-                  let lastElement = branch[type].body[branch[type].body.length - 1];
-                  if (lastElement.type == "ExpressionStatement") {
-                    lastElement.type = "ReturnStatement";
-                    lastElement.argument = lastElement.expression;
-                    delete lastElement.expression;
-                  } else if (lastElement.type == "IfStatement") {
-                    convertIfBranches(lastElement);
-                  }
-                }
-              }
-            };
-            convertIfBranches(lastElement);
-          }
+          convertBlockIntoExpressionInPlace(body);
         }
 
         return createNudLoc(
@@ -2191,6 +2261,45 @@ module.exports = function getTokens() {
     t = createStartOrEndLocation(t, "start", left, props);
     t = createStartOrEndLocation(t, "end", right, props);
     return t;
+  };
+
+  let convertBlockIntoExpressionInPlace = (body) => {
+    let lastElement = body.body[body.body.length - 1];
+
+    // IF last element is expression, then we can use it as return value by converting ExpressionStatement to ReturnStatement
+    if (lastElement.type == "ExpressionStatement") {
+      lastElement.type = "ReturnStatement";
+      lastElement.argument = lastElement.expression;
+      delete lastElement.expression;
+    }
+    // If last element is ObjectExpression, then we can use it as return value by adding ReturnStatement
+    else if (lastElement.type == "ObjectExpression") {
+      body.body[body.body.length - 1] = createLocation({ type: "ReturnStatement", argument: lastElement }, lastElement, lastElement, props);
+    } else if (lastElement.type == "IfStatement") {
+      // This is pretty hard. I thought that maybe we could do the if branch converting in if token, but seems
+      // it's easiest to understand the block structure in this point and do the conversions.
+
+      // Convert all if token branch block last elements into return statements
+      // !TODO! Convert also try catch blocks the same way.
+      let convertIfBranches = (branch) => {
+        // We should convert both alternate and consequent blocks
+        for (type of ["consequent", "alternate"]) {
+          if (branch[type]?.type == "IfStatement") {
+            convertIfBranches(branch[type]);
+          } else if (branch[type]?.type == "BlockStatement") {
+            let lastElement = branch[type].body[branch[type].body.length - 1];
+            if (lastElement.type == "ExpressionStatement") {
+              lastElement.type = "ReturnStatement";
+              lastElement.argument = lastElement.expression;
+              delete lastElement.expression;
+            } else if (lastElement.type == "IfStatement") {
+              convertIfBranches(lastElement);
+            }
+          }
+        }
+      };
+      convertIfBranches(lastElement);
+    }
   };
 
   return tokens;
