@@ -347,12 +347,13 @@ module.exports = class Tokenizer {
                 }
                 this.advanceString();
               } else {
-                if (isNaN(tmpTokenString)) {
+                if (tmpTokenString.length > 0 && isNaN(tmpTokenString[0])) {
                   this.addToken(this.t.identifier_token, tmpTokenString, {}, true);
                   break;
                 } else if (tmpTokenString.length > 0) {
                   // Check decimal numbers
-                  if (!isNaN(tmpTokenString)) {
+                  if (!isNaN(tmpTokenString[0])) {
+                    tmpTokenString = tmpTokenString.replaceAll("_", "");
                     if (this.peekChar(this.text) === ".") {
                       this.advanceString();
                       tmpTokenString += ".";
