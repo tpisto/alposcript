@@ -1227,7 +1227,7 @@ module.exports = function getTokens() {
       props: props,
       leftBindingPower: 50,
       nullDenotation: () => {
-        let right = expression(0);
+        let right = expression(0, { parenthesized: true, parenStart: props.start });
         // console.log("R", right);
         // console.log(peekToken());
         consumeToken("parenthesis_close_token");
@@ -1247,18 +1247,13 @@ module.exports = function getTokens() {
       leftBindingPower: 9,
       props: props,
       value: value,
-      leftDenotation: (left) => {
+      leftDenotation: (left, options) => {
         let right = expression(9, { isParameterOrElement: true });
-        return createLedLoc(
-          {
-            type: "LogicalExpression",
-            left: left,
-            right: right,
-            operator: value,
-          },
-          left,
-          right
-        );
+        let logicalExpression = { type: "LogicalExpression", left: left, right: right, operator: value };
+        if (options?.parenthesized) {
+          logicalExpression.extra = { parenthesized: true, parenStart: options.parenStart };
+        }
+        return createLedLoc(logicalExpression, left, right);
       },
     };
   };
