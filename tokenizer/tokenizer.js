@@ -249,6 +249,9 @@ module.exports = class Tokenizer {
             case "case":
               this.addToken(this.t.switch_case_token, tmpTokenString, null, true);
               break;
+            case "when":
+              this.addToken(this.t.switch_when_token, tmpTokenString, null, true);
+              break;
             case "default":
               this.addToken(this.t.switch_case_token, tmpTokenString, { type: "default" }, true);
               break;

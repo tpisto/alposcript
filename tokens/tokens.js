@@ -403,6 +403,27 @@ module.exports = function getTokens() {
     };
   };
 
+  tokens.switch_when_token = (value, props) => {
+    return {
+      name: "switch_when_token",
+      value: value,
+      props: props,
+      leftBindingPower: 0,
+      nullDenotation: (options) => {
+        if (!options?.isParameterOrElement) {
+          throw new Error("You can use when-then construct only if switch is expression");
+        }
+        test = expression(0);
+        consumeToken("then_token");
+        consequent = expression(0, options);
+        // Add return token to consequent
+        consequent = [createLocation({ type: "ReturnStatement", argument: consequent }, consequent, consequent, props)];
+        // Then just return SwitchCase
+        return createNudLoc({ type: "SwitchCase", test: test, consequent: consequent }, props);
+      },
+    };
+  };
+
   tokens.object_property_token = (value, props) => {
     function getPropertyStructure(value, props, propertyValue, keyValue) {
       let token = {
