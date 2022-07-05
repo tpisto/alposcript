@@ -96,14 +96,14 @@ module.exports = class Tokenizer {
           break;
         case "&":
           if (this.testAndEatFoundChar(this.text, "&")) {
-            this.addToken(this.t.operator_logical_and_token, "&&");
+            this.addToken(this.t.logical_expression_token, "&&");
           } else {
             this.addToken(this.t.operator_bit_and_token, "%");
           }
           break;
         case "|":
           if (this.testAndEatFoundChar("|")) {
-            this.addToken(this.t.operator_logical_or_token, "||");
+            this.addToken(this.t.logical_expression_token, "||");
           } else {
             this.addToken(this.t.operator_bit_or_token, "|");
           }
@@ -199,6 +199,13 @@ module.exports = class Tokenizer {
         case "#":
           this.addComment(this.text);
           break;
+        // !!! WARNING !!! This case uses fallthrough to default if ?? is not found. Please do not move this.
+        case "?":
+          // Only match and break if we have "??"
+          if (this.testAndEatFoundChar(this.text, "?")) {
+            this.addToken(this.t.logical_expression_token, "??");
+            break;
+          }
         default:
           // String tokens
           let previousCharacter = this.text.charAt(this.textPos - 1);

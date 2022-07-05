@@ -1241,42 +1241,20 @@ module.exports = function getTokens() {
   // *************************
   // Logical operators
   // *************************
-  tokens.operator_logical_and_token = (value, props) => {
+  tokens.logical_expression_token = (value, props) => {
     return {
-      name: "operator_add_token",
+      name: "logical_expression_token",
       leftBindingPower: 9,
       props: props,
       value: value,
       leftDenotation: (left) => {
-        let right = expression(9);
+        let right = expression(9, { isParameterOrElement: true });
         return createLedLoc(
           {
             type: "LogicalExpression",
             left: left,
             right: right,
-            operator: "&&",
-          },
-          left,
-          right
-        );
-      },
-    };
-  };
-
-  tokens.operator_logical_or_token = (value, props) => {
-    return {
-      name: "operator_or_token",
-      leftBindingPower: 9,
-      props: props,
-      value: value,
-      leftDenotation: (left) => {
-        let right = expression(9);
-        return createLedLoc(
-          {
-            type: "LogicalExpression",
-            left: left,
-            right: right,
-            operator: "||",
+            operator: value,
           },
           left,
           right
