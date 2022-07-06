@@ -45,3 +45,7 @@ function a({
 }) {
   return c = 2;
 }
+
+a => {
+  return a = 2;
+};

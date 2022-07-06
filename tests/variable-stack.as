@@ -1,4 +1,4 @@
-# Variable stack inside ifs
+# Variable stack
 fn TimeLogField(props) ->
   let myValue = 2
   if true
@@ -26,3 +26,6 @@ fn a(b) ->
 
 fn a({c}) ->
   c = 2
+
+(a) =>
+  a = 2
