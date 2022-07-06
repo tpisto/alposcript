@@ -20,3 +20,9 @@ fn TimeLogField4(props) ->
   if true
     if true
       myValue4 := 3
+
+fn a(b) -> 
+  b = 1
+
+fn a({c}) ->
+  c = 2

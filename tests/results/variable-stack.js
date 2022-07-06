@@ -35,3 +35,13 @@ function TimeLogField4(props) {
     }
   }
 }
+
+function a(b) {
+  return b = 1;
+}
+
+function a({
+  c
+}) {
+  return c = 2;
+}

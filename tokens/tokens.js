@@ -22,8 +22,10 @@ module.exports = function getTokens() {
   // Auto declaring variables using 'let'
   let variableStack = {
     variableScopeStack: [],
+    callParameters: {},
     push(hasScope) {
-      let localVariableStack = { used: {}, add: {}, hasScope: hasScope };
+      let localVariableStack = { used: this.callParameters, add: {}, hasScope: hasScope };
+      this.callParameters = {};
       this.variableScopeStack.push(localVariableStack);
     },
     addVariablesToBody(body) {
@@ -79,12 +81,26 @@ module.exports = function getTokens() {
       }
       this.variableScopeStack.pop();
     },
+    setCallParameters(params) {
+      for (param of params) {
+        if (param.type == "Identifier") {
+          this.callParameters[param.name] = true;
+        }
+        // Object destructuring in call
+        else if (param.type == "ObjectExpression") {
+          for (let property of param.properties) {
+            this.callParameters[property.value.name] = true;
+          }
+        }
+      }
+    },
     setDeclared(name) {
       this.variableScopeStack[this.variableScopeStack.length - 1].used[name] = true;
     },
     isAlreadySetOrDeclared(name) {
       return this.variableScopeStack[this.variableScopeStack.length - 1].add[name] || this.variableScopeStack[this.variableScopeStack.length - 1].used[name];
     },
+
     set(name) {
       if (name) {
         // We allow create variables inside if scope
@@ -1037,7 +1053,7 @@ module.exports = function getTokens() {
       value: value,
       props: props,
       leftBindingPower: 90,
-      leftDenotation: (left) => {
+      leftDenotation: (left, options) => {
         let right;
 
         // := operator prevents to auto-assign into scope. Otherwise we set variable into stack.
@@ -1065,7 +1081,7 @@ module.exports = function getTokens() {
         // let right = expression(0, { isParameterOrElement: true });
         return createLedLoc(
           {
-            type: "AssignmentExpression",
+            type: options?.isFunctionTokenParameter ? "AssignmentPattern" : "AssignmentExpression",
             operator: value,
             left: left,
             right: right,
@@ -1914,15 +1930,8 @@ module.exports = function getTokens() {
       nullDenotation: (options) => {
         let params = [];
         let insertBlock = false;
-        do {
-          if (params.length > 0) {
-            consumeToken("comma_token");
-          }
-          if (peekToken().name != "parenthesis_close_token") {
-            params.push(expression(5));
-          }
-        } while (peekToken().name == "comma_token");
-        consumeToken("parenthesis_close_token");
+        params = getCallParameters();
+        variableStack.setCallParameters(params);
 
         let arrowToken = consumeToken("arrow_token");
 
