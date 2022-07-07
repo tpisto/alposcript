@@ -426,14 +426,18 @@ module.exports = function getTokens() {
       props: props,
       leftBindingPower: 0,
       nullDenotation: (options) => {
-        if (!options?.isParameterOrElement) {
-          throw new Error("You can use when-then construct only if switch is expression");
-        }
         test = expression(0);
         consumeToken("then_token");
         consequent = expression(0, options);
-        // Add return token to consequent
-        consequent = [createLocation({ type: "ReturnStatement", argument: consequent }, consequent, consequent, props)];
+
+        // Add return token to consequent if parameter or element
+        if (options?.isParameterOrElement) {
+          consequent = [createLocation({ type: "ReturnStatement", argument: consequent }, consequent, consequent, props)];
+        } else {
+          // Consequent is a single expression
+          consequent = [convertExpressionIntoExpressionStatement(consequent, options)];
+          consequent.push(createLocation({ type: "BreakStatement", label: null }, consequent[0], consequent[0], props));
+        }
         // Then just return SwitchCase
         return createNudLoc({ type: "SwitchCase", test: test, consequent: consequent }, props);
       },
@@ -898,6 +902,7 @@ module.exports = function getTokens() {
         let test = expression(0);
         let alternate = null;
         let nextToken = peekToken();
+        let isThen = false;
 
         // Support also if nnn then, or if(nnn) then...
         switch (nextToken.name) {
@@ -905,6 +910,7 @@ module.exports = function getTokens() {
             skipNextToken();
             break;
           case "then_token":
+            isThen = true;
             skipNextToken();
             break;
           case "parenthesis_close_token":
@@ -929,6 +935,8 @@ module.exports = function getTokens() {
           }
           alternate = expression(0, options);
         }
+
+        // If nnn then fff, we should create ExpressionStatements
 
         if (options && options.isParameterOrElement == true) {
           // If no alternate, we return undefined (void 8)
@@ -963,8 +971,15 @@ module.exports = function getTokens() {
           );
         } else {
           // Make sure that consequent and alternate are created as blocks (babel generator will not do that)
+          // if nn then we should have expression in the block
+          if (isThen && consequent.type != "BlockStatement") {
+            consequent = convertExpressionIntoExpressionStatement(consequent);
+          }
           consequent = wrapIntoBlockStatementIfNotBlock(consequent);
-          if (alternate?.type != "IfStatement") {
+          if (alternate?.type != "IfStatement" && alternate?.type != "BlockStatement") {
+            if (isThen) {
+              alternate = convertExpressionIntoExpressionStatement(alternate);
+            }
             alternate = wrapIntoBlockStatementIfNotBlock(alternate);
           }
 
@@ -2266,6 +2281,39 @@ module.exports = function getTokens() {
     return t;
   };
 
+  let convertSwitchAndIfToExpressionInPlace = (branch) => {
+    if (branch.type == "IfStatement") {
+      // We should convert both alternate and consequent blocks
+      for (type of ["consequent", "alternate"]) {
+        if (branch[type]?.type == "IfStatement") {
+          convertSwitchAndIfToExpressionInPlace(branch[type]);
+        } else if (branch[type]?.type == "BlockStatement") {
+          let lastElement = branch[type].body[branch[type].body.length - 1];
+          if (lastElement.type == "ExpressionStatement") {
+            lastElement.type = "ReturnStatement";
+            lastElement.argument = lastElement.expression;
+            delete lastElement.expression;
+          } else if (lastElement.type == "IfStatement" || lastElement.type == "SwitchStatement") {
+            convertSwitchAndIfToExpressionInPlace(lastElement);
+          }
+        }
+      }
+    }
+    // Switch
+    if (branch.type == "SwitchStatement") {
+      for (let caseBlock of branch.cases) {
+        let branch = caseBlock.consequent[caseBlock.consequent.length - 2];
+        if (branch.type == "ExpressionStatement") {
+          branch.type = "ReturnStatement";
+          branch.argument = branch.expression;
+          delete branch.expression;
+        } else if (branch.type == "IfStatement" || branch.type == "SwitchStatement") {
+          convertSwitchAndIfToExpressionInPlace(branch);
+        }
+      }
+    }
+  };
+
   let convertBlockIntoExpressionInPlace = (body) => {
     let lastElement = body.body[body.body.length - 1];
 
@@ -2278,30 +2326,28 @@ module.exports = function getTokens() {
     // If last element is ObjectExpression, then we can use it as return value by adding ReturnStatement
     else if (lastElement.type == "ObjectExpression") {
       body.body[body.body.length - 1] = createLocation({ type: "ReturnStatement", argument: lastElement }, lastElement, lastElement, props);
-    } else if (lastElement.type == "IfStatement") {
+    }
+    //
+    // If and Switch statement
+    //
+    else if (lastElement.type == "IfStatement" || lastElement.type == "SwitchStatement") {
       // This is pretty hard. I thought that maybe we could do the if branch converting in if token, but seems
       // it's easiest to understand the block structure in this point and do the conversions.
+      convertSwitchAndIfToExpressionInPlace(lastElement);
+    }
+  };
 
-      // Convert all if token branch block last elements into return statements
-      // !TODO! Convert also try catch blocks the same way.
-      let convertIfBranches = (branch) => {
-        // We should convert both alternate and consequent blocks
-        for (type of ["consequent", "alternate"]) {
-          if (branch[type]?.type == "IfStatement") {
-            convertIfBranches(branch[type]);
-          } else if (branch[type]?.type == "BlockStatement") {
-            let lastElement = branch[type].body[branch[type].body.length - 1];
-            if (lastElement.type == "ExpressionStatement") {
-              lastElement.type = "ReturnStatement";
-              lastElement.argument = lastElement.expression;
-              delete lastElement.expression;
-            } else if (lastElement.type == "IfStatement") {
-              convertIfBranches(lastElement);
-            }
-          }
-        }
+  let convertExpressionIntoExpressionStatement = (myExpression, options) => {
+    if (!notExpressionStatements.includes(myExpression.type) && options?.noExpressionStatement != true && !options?.isParameterOrElement) {
+      return {
+        type: "ExpressionStatement",
+        expression: myExpression,
+        start: myExpression.start,
+        end: myExpression.end,
+        loc: myExpression.loc,
       };
-      convertIfBranches(lastElement);
+    } else {
+      return myExpression;
     }
   };
 
