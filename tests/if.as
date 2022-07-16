@@ -59,3 +59,9 @@ else if b
 else 
   x = 3
 
+if a * 80 < b
+  x = 1
+else if a * 80 > b
+  x = 2
+else
+  x = 3
