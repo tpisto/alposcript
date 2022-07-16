@@ -1716,6 +1716,7 @@ module.exports = function getTokens() {
               consumeToken("comma_token");
             }
           }
+
           // Close at dedent
           if (isBlock && peekToken().name == "block_token" && peekToken().value == "DEDENT") {
             consumeToken("block_token");
@@ -1723,7 +1724,7 @@ module.exports = function getTokens() {
             break;
           }
           // Add array element
-          else if (peekToken().name != "array_token" && peekToken().value != "]") {
+          else if (!(peekToken().name == "array_token" && peekToken().value == "]")) {
             if (peekToken().name == "end_token") {
               consumeToken("end_token");
             }
