@@ -91,6 +91,8 @@ module.exports = function getTokens() {
           for (let property of param.properties) {
             if (property.type == "ObjectProperty") {
               this.callParameters[property.value.name] = true;
+            } else if (property.type == "SpreadElement") {
+              this.callParameters[property.argument.name] = true;
             }
           }
         }

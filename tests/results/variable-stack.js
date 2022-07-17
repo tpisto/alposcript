@@ -50,6 +50,7 @@ function c({
   d,
   ...f
 }) {
+  f = 2;
   return d = 2;
 }
 
