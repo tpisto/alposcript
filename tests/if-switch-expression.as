@@ -1,3 +1,4 @@
+# If switch expression
 fn a() -> 
   switch a
     when 2 then if 3 then 4 else 5
