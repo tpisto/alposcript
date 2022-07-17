@@ -89,7 +89,9 @@ module.exports = function getTokens() {
         // Object destructuring in call
         else if (param.type == "ObjectExpression") {
           for (let property of param.properties) {
-            this.callParameters[property.value.name] = true;
+            if (property.type == "ObjectProperty") {
+              this.callParameters[property.value.name] = true;
+            }
           }
         }
       }

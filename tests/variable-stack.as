@@ -24,8 +24,11 @@ fn TimeLogField4(props) ->
 fn a(b) -> 
   b = 1
 
-fn a({c}) ->
+fn b({c}) ->
   c = 2
+
+fn c({d, ...f}) ->
+  d = 2  
 
 (a) =>
   a = 2

@@ -40,10 +40,17 @@ function a(b) {
   return b = 1;
 }
 
-function a({
+function b({
   c
 }) {
   return c = 2;
+}
+
+function c({
+  d,
+  ...f
+}) {
+  return d = 2;
 }
 
 a => {
