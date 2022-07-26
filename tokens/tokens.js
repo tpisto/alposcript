@@ -1385,14 +1385,29 @@ module.exports = function getTokens() {
       props: props,
       value: value,
       nullDenotation: () => {
+        let handler = null;
+
         if (peekToken().name == "end_token") {
           consumeToken("end_token");
         }
         let block = expression(0);
-        if (peekToken().name == "end_token") {
-          consumeToken("end_token");
+
+        if (peekToken().name == "catch_clause_token" || peekToken(2).name == "catch_clause_token") {
+          if (peekToken().name == "end_token") {
+            consumeToken("end_token");
+          }
+          handler = expression(0);
         }
-        let handler = expression(0);
+
+        // Support also only "try" clause. Then we insert empty catch.
+        else {
+          let loc = { line: block.loc.end.line, column: block.loc.end.column, end: block.loc.end.line, start: block.loc.end.column, length: 0 };
+          handler = createNudLoc(
+            { type: "CatchClause", param: createNudLoc({ type: "Identifier", name: "e$" }, loc), body: createNudLoc({ type: "BlockStatement", body: [], directives: [] }, loc) },
+            loc
+          );
+        }
+
         return createLocation(
           {
             type: "TryStatement",
