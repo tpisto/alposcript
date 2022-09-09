@@ -149,7 +149,17 @@ module.exports = class Tokenizer {
               this.addToken("arrow_token", "->", { disableImplicitReturn });
             }
           } else {
-            this.addToken(this.t.operator_sub_token, "-");
+            // If next character is a number (test with regexp), then this is a minus operator
+            if (this.peekChar(this.text) != " " && this.peekChar(this.text).match(/[0-9]/)) {
+              // Create literal token by getting all numbers that follows the minus sign
+              let number = this.text.substring(this.textPos).match(/^-?[0-9]+(\.[0-9]+)?/)[0];
+              this.addToken(this.t.literal_token, number, { value: parseFloat(number) });
+              this.textPos += number.length;
+              this.column += number.length;
+              continue textLoop;
+            } else {
+              this.addToken(this.t.operator_sub_token, "-");
+            }
           }
           break;
         case "\n":
