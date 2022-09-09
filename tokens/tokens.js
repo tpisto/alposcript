@@ -1543,7 +1543,8 @@ module.exports = function getTokens() {
     };
   };
 
-  function getCallParameters() {
+  function getCallParameters(options) {
+    let hasParenOpen = false;
     let params = [];
     // Handling the following case:
     // let a = b do
@@ -1562,6 +1563,7 @@ module.exports = function getTokens() {
       }
 
       if (peekToken().name == "parenthesis_open_token") {
+        hasParenOpen = true;
         consumeToken("parenthesis_open_token");
       }
 
@@ -1600,7 +1602,7 @@ module.exports = function getTokens() {
       }
     } while (peekToken().name == "comma_token");
 
-    if (peekToken().name == "parenthesis_close_token") {
+    if (peekToken().name == "parenthesis_close_token" && !(options?.isCallExpression == true && hasParenOpen == false)) {
       consumeToken("parenthesis_close_token");
     }
 
@@ -1672,7 +1674,7 @@ module.exports = function getTokens() {
       value: value,
       props: props,
       nullDenotation: (callee) => {
-        let params = getCallParameters();
+        let params = getCallParameters({ isCallExpression: true });
         let myCallee = callee?.type == "CallExpression" ? callee : token.nullDenotation();
 
         return createLocation(
@@ -1687,7 +1689,7 @@ module.exports = function getTokens() {
         );
       },
       leftDenotation: (left) => {
-        let params = getCallParameters();
+        let params = getCallParameters({ isCallExpression: true });
         return createLocation(
           {
             type: left.type == "OptionalMemberExpression" ? "OptionalCallExpression" : "CallExpression",

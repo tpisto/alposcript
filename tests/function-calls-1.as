@@ -8,3 +8,4 @@ let b = () => { c = 1; d = () => 'hi'; e = 3 }
 o.a()
 o.a('1')
 o.b({ a: 1 })
+fun1(a, (b) => fun2 fun2param) != -1
