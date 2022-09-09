@@ -88,6 +88,7 @@ module.exports = function processTokens(tokens, myTokenArray) {
         nextTokenName == "unary_expression_token" ||
         nextTokenName == "regexp_literal_token" ||
         nextTokenName == "switch_statement_token" ||
+        nextTokenName == "if_statement_token" ||
         nextTokenName == "template_literal_token"
       ) {
         // We can use "do" keyword to call indented blocks
