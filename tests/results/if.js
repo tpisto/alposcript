@@ -84,3 +84,7 @@ if (a * 80 < b) {
 } else {
   x = 3;
 }
+
+if ((!a[b] || !c[d]) && !f) {
+  console.log("hello");
+}

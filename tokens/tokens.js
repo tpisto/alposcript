@@ -899,10 +899,6 @@ module.exports = function getTokens() {
           options = Object.assign(options, { hasScope: false });
         }
 
-        if (peekToken().name == "parenthesis_open_token") {
-          skipNextToken();
-        }
-
         let test = expression(0);
         let alternate = null;
         let nextToken = peekToken();
@@ -916,12 +912,6 @@ module.exports = function getTokens() {
           case "then_token":
             isThen = true;
             skipNextToken();
-            break;
-          case "parenthesis_close_token":
-            skipNextToken();
-            if (peekToken().name == "end_token") {
-              skipNextToken();
-            }
             break;
         }
 

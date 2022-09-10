@@ -65,3 +65,6 @@ else if a * 80 > b
   x = 2
 else
   x = 3
+
+if (not a[b] || not c[d]) && !f
+  console.log 'hello'
