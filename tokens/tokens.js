@@ -1270,11 +1270,11 @@ module.exports = function getTokens() {
   tokens.logical_expression_token = (value, props) => {
     return {
       name: "logical_expression_token",
-      leftBindingPower: 9,
+      leftBindingPower: 8,
       props: props,
       value: value,
       leftDenotation: (left, options) => {
-        let right = expression(9, { isParameterOrElement: true });
+        let right = expression(8, { isParameterOrElement: true });
         let logicalExpression = { type: "LogicalExpression", left: left, right: right, operator: value };
         if (options?.parenthesized) {
           logicalExpression.extra = { parenthesized: true, parenStart: options.parenStart };
