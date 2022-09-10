@@ -1548,14 +1548,14 @@ module.exports = function getTokens() {
       consumeToken("end_token");
     }
 
+    if (peekToken().name == "parenthesis_open_token") {
+      hasParenOpen = true;
+      consumeToken("parenthesis_open_token");
+    }
+
     do {
       if (params.length > 0) {
         consumeToken("comma_token");
-      }
-
-      if (peekToken().name == "parenthesis_open_token") {
-        hasParenOpen = true;
-        consumeToken("parenthesis_open_token");
       }
 
       if (peekToken().name == "end_token" && peekToken(2).name == "block_token") {

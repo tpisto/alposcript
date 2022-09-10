@@ -47,7 +47,7 @@ for (let file of testDir) {
               useGrouping: false,
             }) +
             ":"
-        )} ${lines[0].substr(2).padEnd(40)} ${fileName.padEnd(40)} ${chalk.green("succeeded")}`
+        )} ${lines[0].substr(2).padEnd(45)} ${fileName.padEnd(45)} ${chalk.green("succeeded")}`
       );
     } catch (error) {
       console.log(`${chalk.blue("Test" + testNum + ":")} ${lines[0].substr(2).padEnd(45)} ${fileName.padEnd(35)} ${chalk.red("failed")}`);
