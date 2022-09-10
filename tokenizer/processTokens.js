@@ -61,7 +61,6 @@ module.exports = function processTokens(tokens, myTokenArray) {
           }
         }
       }
-      myTokenArray.splice(i, 1);
     }
   }
 
@@ -120,6 +119,11 @@ module.exports = function processTokens(tokens, myTokenArray) {
     }
     // Convert )[ to member expression. // We can have a(1)[2] calls
     if (myTokenArray[i].name == "parenthesis_close_token" && myTokenArray[i + 1].name == "array_token" && myTokenArray[i + 1].value == "[") {
+      myTokenArray[i + 1].props.computed = true;
+      myTokenArray[i + 1] = convertToken(tokens.member_expression_token, myTokenArray[i + 1]);
+    }
+    // Convert ][ to member expression. // We can have a[1][2] calls
+    if (myTokenArray[i].name == "array_token" && myTokenArray[i].value == "]" && myTokenArray[i + 1].name == "array_token" && myTokenArray[i + 1].value == "[") {
       myTokenArray[i + 1].props.computed = true;
       myTokenArray[i + 1] = convertToken(tokens.member_expression_token, myTokenArray[i + 1]);
     }

@@ -479,6 +479,7 @@ module.exports = function getTokens() {
             keyValue = keyValue.elements[0];
           } else {
             consumeToken("array_token", "]");
+            consumeToken("colon_token");
           }
         } else {
           if (props.options?.hasLiteralKey) {
