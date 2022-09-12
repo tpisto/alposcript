@@ -150,7 +150,7 @@ module.exports = function getTokens() {
       return left;
     } catch (error) {
       // For debugging (at this point, will be removed asap)
-      // console.log("ERROR", error);
+      console.log("ERROR", error);
 
       let token = peekToken();
       // !TODO! Allow better error messages. Now error messages that tokens are emitting, are not shown =(

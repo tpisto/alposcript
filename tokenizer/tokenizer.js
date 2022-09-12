@@ -68,9 +68,14 @@ module.exports = class Tokenizer {
         case "+":
           this.addToken(this.t.operator_add_token, "+");
           break;
+        case "~":
+          this.addToken(this.t.unary_expression_token, "~");
+          break;
+        case "^":
+          this.addToken(this.t.binary_expression_token, "^");
+          break;
         case "*":
-          if (this.peekChar(this.text) == "*") {
-            this.advanceString();
+          if (this.testAndEatFoundChar(this.text, "*")) {
             this.addToken(this.t.operator_exp_token, "**");
           } else {
             this.addToken(this.t.operator_mul_token, "*");
@@ -98,14 +103,14 @@ module.exports = class Tokenizer {
           if (this.testAndEatFoundChar(this.text, "&")) {
             this.addToken(this.t.logical_expression_token, "&&");
           } else {
-            this.addToken(this.t.operator_bit_and_token, "%");
+            this.addToken(this.t.binary_expression_token, "&");
           }
           break;
         case "|":
-          if (this.testAndEatFoundChar("|")) {
+          if (this.testAndEatFoundChar(this.text, "|")) {
             this.addToken(this.t.logical_expression_token, "||");
           } else {
-            this.addToken(this.t.operator_bit_or_token, "|");
+            this.addToken(this.t.binary_expression_token, "|");
           }
           break;
         case "!":
@@ -291,7 +296,16 @@ module.exports = class Tokenizer {
             case ">":
               this.addToken(this.t.binary_expression_token, tmpTokenString, null, true);
               break;
+            case ">>":
+              this.addToken(this.t.binary_expression_token, tmpTokenString, null, true);
+              break;
+            case ">>>":
+              this.addToken(this.t.binary_expression_token, tmpTokenString, null, true);
+              break;
             case "<":
+              this.addToken(this.t.binary_expression_token, tmpTokenString, null, true);
+              break;
+            case "<<":
               this.addToken(this.t.binary_expression_token, tmpTokenString, null, true);
               break;
             case ">=":
