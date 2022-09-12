@@ -686,6 +686,19 @@ module.exports = function getTokens() {
     };
   };
 
+  tokens.import_namespace_specifier_token = (value, props) => {
+    return {
+      name: "import_namespace_specifier_token",
+      value: value,
+      props: props,
+      nullDenotation: () => {
+        return {
+          type: "ImportNamespaceSpecifier",
+          local: expression(0),
+        };
+      },
+    };
+  };
   tokens.import_declaration_token = (value, props) => {
     return {
       name: "import_declaration_token",
@@ -697,6 +710,11 @@ module.exports = function getTokens() {
         let nextToken = peekToken().name;
         let skipComma = false;
         let importSpecifiers = [];
+
+        // Import * as a from "b";
+        if (nextToken == "import_namespace_specifier_token") {
+          importSpecifiers.push(expression(0));
+        }
 
         // If we have default and then specifiers... like - import React, { useRef } from "react"
         if (nextToken != "block_token" && peekToken(2).name == "comma_token") {

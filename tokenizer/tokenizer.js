@@ -249,6 +249,12 @@ module.exports = class Tokenizer {
               break;
             case "import":
               this.addToken(this.t.import_declaration_token, tmpTokenString, null, true);
+              // If next characters are "* as ", then add also ImportNamespaceSpecifier
+              if (this.text.substring(this.textPos + 2).startsWith("* as ")) {
+                this.addToken(this.t.import_namespace_specifier_token, "* as", null, true);
+                this.textPos += 5;
+                this.column += 5;
+              }
               break;
             case "from":
               this.addToken("from_token", tmpTokenString, null, true);
