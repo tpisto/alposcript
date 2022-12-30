@@ -1023,37 +1023,14 @@ module.exports = function getTokens() {
 
         // !TODO! Allow "then"
         let left = expression(0);
-        let inConversion = false;
+        let isInStatement = false;
         if (peekToken().name == "in_token") {
+          isInStatement = true;
           consumeToken("in_token");
-          inConversion = true;
         } else {
           consumeToken("of_token");
         }
         let right = expression(0);
-
-        // !TODO! We do now here the conversion of in -> .entries(). Maybe we don't want to do it here, but at processTokens instead.
-        // We have to mangle the right if we would like to add .entries() around the right side of the "in"
-        if (inConversion) {
-          right = {
-            type: "CallExpression",
-            callee: {
-              type: "MemberExpression",
-              object: right,
-              property: {
-                type: "Identifier",
-                name: "entries",
-              },
-              start: right.start,
-              end: right.end,
-              loc: right.loc,
-            },
-            start: right.start,
-            end: right.end,
-            loc: right.loc,
-            arguments: [],
-          };
-        }
 
         consumeToken("end_token");
 
@@ -1064,7 +1041,7 @@ module.exports = function getTokens() {
 
         return createNudLoc(
           {
-            type: "ForOfStatement",
+            type: isInStatement ? "ForInStatement" : "ForOfStatement",
             left: left,
             right: right,
             body: body,

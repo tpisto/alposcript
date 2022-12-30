@@ -128,41 +128,6 @@ module.exports = function processTokens(tokens, myTokenArray) {
       myTokenArray[i + 1] = convertToken(tokens.member_expression_token, myTokenArray[i + 1]);
     }
 
-    // For
-    if (
-      myTokenArray[i].name == "for_statement_token" &&
-      myTokenArray[i + 1].name == "identifier_token" &&
-      myTokenArray[i + 2].name == "comma_token" &&
-      myTokenArray[i + 3].name == "identifier_token"
-    ) {
-      // Create "for" array expression "for key, value of myObject"
-      // This is quite big modification, but it enables pretty easy "for of" with keys and values for objects.
-      // Close array before "of" and add Object.entries for the identfier
-      let maxLength = myTokenArray.length;
-      for (let p = i; p < maxLength; p++) {
-        if (myTokenArray[p].name == "in_token") {
-          myTokenArray.splice(p, 0, { name: "array_token", value: "]", props: myTokenArray[p].props });
-
-          // // Find end, block
-          break;
-          // // Object.entries
-          // if (myTokenArray[p + 2].name == "identifier_token" && myTokenArray[p + 4]?.value != "entries") {
-          //   myTokenArray.splice(p + 2, 0, tokens.identifier_token("Object.entries", myTokenArray[p + 1].props));
-          // }
-        }
-        if (myTokenArray[p].name == "of_token") {
-          myTokenArray.splice(p, 0, { name: "array_token", value: "]", props: myTokenArray[p].props });
-          // Object.entries
-          if ((myTokenArray[p + 2].name == "identifier_token" || myTokenArray[p + 2].name == "this_token") && myTokenArray[p + 4]?.value != "entries") {
-            myTokenArray.splice(p + 2, 0, tokens.identifier_token("Object.entries", myTokenArray[p + 1].props));
-          }
-          break;
-        }
-      }
-      myTokenArray.splice(i + 1, 0, tokens.array_token("[", myTokenArray[i].props));
-      myTokenArray.splice(i + 1, 0, tokens.variable_declarator_token("let", myTokenArray[i].props));
-    }
-
     // !TODO! refactor this.
     // Create arrow expression token
     if (myTokenArray[i].name == "arrow_token") {
