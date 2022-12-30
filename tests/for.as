@@ -1,4 +1,4 @@
-# For Of
+# For Of, For In
 for const [a, b] of c
   a = 1
 
@@ -19,3 +19,8 @@ for a in g
 for a of g
   console.log a
 
+for k in tree.children
+  console.log 'K', k
+
+for k, child of tree.children
+  console.log 'K', k
