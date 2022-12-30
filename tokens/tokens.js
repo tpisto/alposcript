@@ -1085,7 +1085,7 @@ module.exports = function getTokens() {
         let right;
 
         // := operator prevents to auto-assign into scope. Otherwise we set variable into stack.
-        if (props.options.doNotAddToScope != true) {
+        if (props.options.doNotAddToScope != true && options?.doNotAddToScope != true) {
           variableStack.set(left.name);
         }
 
@@ -1837,11 +1837,18 @@ module.exports = function getTokens() {
           if (nextTokenName == "array_token") {
             objectProperty = tokens.object_property_token(nextToken.value, { ...nextToken.props, computed: true }).nullDenotation({ isFirstProperty: false });
           } else {
-            objectProperty = expression(0, { isFirstProperty: properties.length <= 0 && props.hasBlock != true });
+            objectProperty = expression(0, { isFunctionTokenParameter: true, doNotAddToScope: true, isFirstProperty: properties.length <= 0 && props.hasBlock != true });
           }
 
           // We allow also single identifiers - that needs to be converted to object properties
           if (nextTokenName == "identifier_token") {
+            let key = objectProperty;
+            let value = objectProperty;
+            // Change assignment expression to assignment pattern. This is needed for object destructuring default values like { a = 1 } = { b: 1 }
+            if (objectProperty.type == "AssignmentPattern") {
+              key = objectProperty.left;
+            }
+
             objectProperty = createNudLoc(
               {
                 type: "ObjectProperty",
@@ -1851,8 +1858,8 @@ module.exports = function getTokens() {
                   shorthand: true,
                 },
                 computed: false,
-                key: objectProperty,
-                value: objectProperty,
+                key: key,
+                value: value,
               },
               props
             );
