@@ -27,11 +27,3 @@ for (a in g) {
 for (a of g) {
   console.log(a);
 };
-
-for (k in tree.children) {
-  console.log("K", k);
-};
-
-for (let [k, child] of Object.entries(tree.children)) {
-  console.log("K", k);
-};
