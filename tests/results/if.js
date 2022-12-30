@@ -88,3 +88,5 @@ if (a * 80 < b) {
 if ((!a[b] || !c[d]) && !f) {
   console.log("hello");
 }
+
+let g = b ? c : d;

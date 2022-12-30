@@ -68,3 +68,9 @@ else
 
 if (not a[b] || not c[d]) && !f
   console.log 'hello'
+
+let g = 
+  if b
+    c
+  else
+    d
