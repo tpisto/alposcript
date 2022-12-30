@@ -143,25 +143,6 @@ module.exports = function processTokens(tokens, myTokenArray) {
         if (myTokenArray[p].name == "in_token") {
           myTokenArray.splice(p, 0, { name: "array_token", value: "]", props: myTokenArray[p].props });
 
-          // Convert "in" to "of"
-          myTokenArray[p + 1].name = "of_token";
-
-          // Find end token index
-          let endTokenIndex = p;
-          for (let p2 = p; p2 < maxLength; p2++) {
-            if (myTokenArray[p2].name == "end_token") {
-              endTokenIndex = p2;
-              break;
-            }
-          }
-
-          // Add "member_expression_token" and "identifier_token" entries before end token
-          // Parenthesis open and close "parenthesis_open_token" and "parenthesis_close_token
-          myTokenArray.splice(endTokenIndex, 0, { name: "parenthesis_close_token", value: ")", props: myTokenArray[p].props });
-          myTokenArray.splice(endTokenIndex, 0, tokens.parenthesis_open_token("(", myTokenArray[p].props));        
-          myTokenArray.splice(endTokenIndex, 0, tokens.call_expression_token("entries", myTokenArray[p].props));
-          myTokenArray.splice(endTokenIndex, 0, tokens.member_expression_token(".", myTokenArray[p].props));
-          
           // // Find end, block
           break;
           // // Object.entries
