@@ -1093,10 +1093,6 @@ module.exports = function getTokens() {
         if (peekToken(1).name == "end_token" && peekToken(2).name == "block_token" && (peekToken(3).name == "object_expression_token" || peekToken(3).name == "object_property_token")) {
           consumeToken("end_token");
         }
-        // Allow to have if statement in the next line
-        if (peekToken(1).name == "end_token" && peekToken(2).name == "block_token" && peekToken(3).name == "if_statement_token") {
-          consumeToken("end_token");
-        }
 
         // Allow to have the declaration on the next line
         if (peekToken().name == "block_token") {
@@ -1107,7 +1103,14 @@ module.exports = function getTokens() {
           }
           consumeToken("block_token");
         } else {
-          right = expression(0, { isParameterOrElement: true });
+          // Allow to have if statement in the next line
+          if (peekToken(1).name == "end_token" && peekToken(2).name == "block_token" && peekToken(3).name == "if_statement_token") {
+            consumeToken("end_token");
+            right = expression(0, { isParameterOrElement: true });
+            right = right.body[0];
+          } else {
+            right = expression(0, { isParameterOrElement: true });
+          }
         }
 
         // let right = expression(0, { isParameterOrElement: true });

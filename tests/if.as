@@ -74,3 +74,9 @@ let g =
     c
   else
     d
+
+g = 
+  if b
+    c
+  else
+    d

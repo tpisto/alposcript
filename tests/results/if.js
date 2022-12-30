@@ -90,3 +90,4 @@ if ((!a[b] || !c[d]) && !f) {
 }
 
 let g = b ? c : d;
+g = b ? c : d;
