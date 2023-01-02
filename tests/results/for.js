@@ -28,10 +28,10 @@ for (a of g) {
   console.log(a);
 };
 
-for (let [k, v] of tree.children.entries()) {
+for (let [k, v] in tree.children) {
   console.log("K", k, "V", v);
 };
 
-for (let [k, v] of Object.entries(tree.children)) {
+for (let [k, v] of tree.children) {
   console.log("K", k, "V", child);
 };
